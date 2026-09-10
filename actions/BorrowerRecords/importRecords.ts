@@ -12,6 +12,14 @@ import {
 import { GaxiosError } from "gaxios";
 import { revalidatePath } from "next/cache";
 
+import { DatabaseError, Pool } from "pg";
+import { pipeline } from "stream/promises";
+import { from as copyFrom } from "pg-copy-streams";
+import { Readable } from "stream";
+import cuid from "cuid";
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
 export default async function importRecords(
    sheetName: string,
    range: string,
@@ -30,6 +38,9 @@ export default async function importRecords(
          error: "NOT_FOUND",
          message: "Please provide a spreadsheet ID before continuing.",
       };
+
+   const client = await pool.connect(); // initialize the client
+
    try {
       const pendingRegistrationCount = await prisma.pendingRegistration.count();
       if (pendingRegistrationCount > 0)
@@ -40,34 +51,77 @@ export default async function importRecords(
                "Please clear the pending registrations before continuing.",
          };
 
-      const result = await sheetsService.spreadsheets.values.get({
-         spreadsheetId: user.configuration.spreadsheetId,
+      const res = await sheetsService.spreadsheets.values.get({
+         spreadsheetId: user.configuration.spreadsheetId!,
          range: `${sheetName}!${range}`,
       });
-      if (!result.data.values)
-         return { ok: true, data: { message: "No result" } };
 
-      const data = result.data.values.map((d) => ({
-         idNumber: d[0],
-         name: d[1],
-         yearLevel: parseInt(d[2], 10),
-         program: d[3],
-         college: d[4],
+      const rows = res.data.values ?? [];
+      if (rows.length === 0)
+         return { ok: true, data: { message: "No records to sync" } };
+
+      const records = rows.map((row) => ({
+         id: cuid(), // only used if the borrower doesn't already exist
+         idNumber: row[0],
+         name: row[1],
+         yearLevel: parseInt(row[2], 10),
+         program: row[3],
+         college: row[4],
       }));
-      const { count } = await prisma.borrower.createMany({
-         skipDuplicates: true,
-         data,
-      });
+
+      await client.query("BEGIN");
+
+      await client.query(`
+         CREATE TEMP TABLE staging_borrower (
+            id TEXT,
+            "idNumber" TEXT,
+            name TEXT,
+            "yearLevel" INT,
+            program TEXT,
+            college TEXT
+         ) ON COMMIT DROP
+      `);
+
+      const copyStream = client.query(
+         copyFrom(`COPY staging_borrower FROM STDIN WITH (FORMAT csv)`),
+      );
+
+      const csvData = records
+         .map((r) =>
+            [r.id, r.idNumber, r.name, r.yearLevel, r.program, r.college]
+               .map(csvEscape)
+               .join(","),
+         )
+         .join("\n");
+
+      await pipeline(Readable.from([csvData]), copyStream);
+
+      const result = await client.query(`
+         INSERT INTO "Borrower" (id, "idNumber", name, "yearLevel", program, college)
+         SELECT id, "idNumber", name, "yearLevel", program, college FROM staging_borrower
+         ON CONFLICT ("idNumber") DO UPDATE SET
+            name = EXCLUDED.name,
+            "yearLevel" = EXCLUDED."yearLevel",
+            program = EXCLUDED.program,
+            college = EXCLUDED.college
+      `);
+
+      await client.query("COMMIT");
 
       revalidatePath(borrowerRecordsPage);
       revalidatePath(importBorrowerRecordsPage);
-      return { ok: true, data: { message: `Imported ${count} record/s` } };
-   } catch (e) {
-      if (e instanceof PrismaClientKnownRequestError) {
-         console.error(e);
+      return {
+         ok: true,
+         data: { message: `Synced ${result.rowCount ?? 0} records` },
+      };
+   } catch (err) {
+      await client.query("ROLLBACK");
+
+      if (err instanceof PrismaClientKnownRequestError) {
+         console.error(err);
          return { ok: false, error: "DATABASE", message: "Prisma error" };
       }
-      if (e instanceof PrismaClientValidationError) {
+      if (err instanceof PrismaClientValidationError) {
          return {
             ok: false,
             error: "DATABASE",
@@ -75,14 +129,14 @@ export default async function importRecords(
                "Couldn't import records. Check that the sheet name and range are correct and valid.",
          };
       }
-      if (e instanceof GaxiosError) {
-         const status = e.response?.status;
+      if (err instanceof GaxiosError) {
+         const status = err.response?.status;
          if (status === 400) {
             return {
                ok: false,
                error: "VALIDATION",
                message:
-                  "Couldn't import records. Check that the sheet name and range are correct and valid.",
+                  "Couldn't sync records. Check that the sheet name and range are correct and valid.",
             };
          }
          if (status === 404) {
@@ -107,10 +161,47 @@ export default async function importRecords(
             };
          }
 
-         console.error("Sheets API error:", status, e.response?.data);
-         return { ok: false, error: "OTHER", message: e.message };
+         console.error("Sheets API error:", status, err.response?.data);
+         return { ok: false, error: "OTHER", message: err.message };
       }
-      console.error(e);
+
+      // raw postgres errors from pg/pg-copy-streams — these don't come through
+      // as prisma error classes since this path bypasses prisma client
+      if (err instanceof DatabaseError) {
+         console.error("Postgres error:", err.code, err.message);
+         if (err.code === "23505") {
+            return {
+               ok: false,
+               error: "VALIDATION",
+               message: "Duplicate idNumber found in the sheet data",
+            };
+         }
+         if (err.code === "22P02" || err.code === "23502") {
+            return {
+               ok: false,
+               error: "VALIDATION",
+               message:
+                  "Some rows have missing or invalid values (check yearLevel and required columns)",
+            };
+         }
+         return {
+            ok: false,
+            error: "DATABASE",
+            message: "Database error while importing records",
+         };
+      }
+
+      console.error(err);
       return { ok: false, error: "OTHER", message: "Internal server error" };
+   } finally {
+      client.release();
    }
+}
+
+function csvEscape(val: unknown): string {
+   const s = String(val ?? "");
+   if (s.includes(",") || s.includes('"') || s.includes("\n")) {
+      return `"${s.replace(/"/g, '""')}"`;
+   }
+   return s;
 }

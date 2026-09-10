@@ -1,9 +1,7 @@
 "use client";
 
 import importRecords from "@/actions/BorrowerRecords/importRecords";
-import { borrowerRecordsPage } from "@/constants";
-import { ChevronLeft, Download, LoaderCircle } from "lucide-react";
-import Link from "next/link";
+import { Download, LoaderCircle } from "lucide-react";
 import { useActionState, useState } from "react";
 import { toast } from "react-toastify";
 
@@ -15,7 +13,6 @@ export default function ImportPage() {
       range: "",
    });
    const onAction = async () => {
-      if (isPending) return;
       const loadingToast = toast.loading("Importing...");
       const res = await importRecords(info.sheetName, info.range);
       if (res.ok) {
@@ -41,7 +38,14 @@ export default function ImportPage() {
    return (
       <div className="font-inter mx-auto mt-4 px-2 text-gray-700 select-none">
          <h1 className="text-xl font-semibold">Import Student Record</h1>
-         <form action={formAction} className="mt-2 space-y-2">
+         <form
+            action={formAction}
+            className="mt-2 space-y-2"
+            onSubmit={(e) => {
+               if (isPending) e.preventDefault();
+               setError("");
+            }}
+         >
             <div>
                <label htmlFor="sheetname" className="block text-sm">
                   Sheet name
