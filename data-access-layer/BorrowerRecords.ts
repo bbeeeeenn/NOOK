@@ -56,7 +56,7 @@ async function getCachedBorrowerRecords(
    page = 1,
    pageSize = BORROWERS_PAGE_SIZE,
 ): Promise<PaginatedBorrowers> {
-   "use cache";
+   "use cache: remote";
    cacheLife("days");
 
    const where = {
@@ -101,7 +101,7 @@ export async function getBorrowerRecordsCount(): Promise<Result<number>> {
 }
 
 async function getCachedBorrowerRecordsCount() {
-   "use cache";
+   "use cache: remote";
    cacheLife("days");
 
    return await prisma.borrower.count();
