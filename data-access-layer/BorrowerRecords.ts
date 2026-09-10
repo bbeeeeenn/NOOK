@@ -58,7 +58,6 @@ async function getCachedBorrowerRecords(
 ): Promise<PaginatedBorrowers> {
    "use cache";
    cacheLife("days");
-   console.log("cache miss");
 
    const where = {
       idNumber,
