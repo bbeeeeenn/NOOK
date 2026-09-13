@@ -98,7 +98,9 @@ export default async function importRecords(
 
       const result = await client.query(`
          INSERT INTO "Borrower" (id, "idNumber", name, "yearLevel", program, college)
-         SELECT id, "idNumber", name, "yearLevel", program, college FROM staging_borrower
+         SELECT DISTINCT ON ("idNumber") id, "idNumber", name, "yearLevel", program, college
+         FROM staging_borrower
+         ORDER BY "idNumber", id ASC
          ON CONFLICT ("idNumber") DO UPDATE SET
             name = EXCLUDED.name,
             "yearLevel" = EXCLUDED."yearLevel",
@@ -188,6 +190,7 @@ export default async function importRecords(
                   "Some rows have missing or invalid values (check yearLevel and required columns)",
             };
          }
+         console.error(err);
          return {
             ok: false,
             error: "DATABASE",
