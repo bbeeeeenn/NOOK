@@ -11,9 +11,11 @@ import {
    ChevronRight,
    LoaderCircle,
    LogOut,
+   LucideIcon,
    Menu,
    NotepadText,
    ScanLine,
+   ScrollText,
    Settings,
    UserRound,
    Wrench,
@@ -27,24 +29,18 @@ import {
    scannerPage,
    settingsPage,
    borrowerRecordsPage,
+   reportsPage,
 } from "@/constants";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 
-const links = [
+const links: { label: string; route: string; icon: LucideIcon }[] = [
    { label: "Borrow Logs", route: logsPage, icon: NotepadText },
    { label: "Scanner", route: scannerPage, icon: ScanLine },
    { label: "Student Records", route: borrowerRecordsPage, icon: UserRound },
+   { label: "Reports", icon: ScrollText, route: reportsPage },
    { label: "Configurations", route: configurationsPage, icon: Wrench },
-];
-
-const routeLabels = [
-   [logsPage, "Borrow Logs"],
-   [borrowerRecordsPage, "Student Records"],
-   [scannerPage, "Scanner"],
-   [configurationsPage, "Configurations"],
-   [settingsPage, "Settings"],
 ];
 
 function LogoutButton() {
@@ -169,7 +165,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
                <Menu size={30} />
             </button>
             <p className="font-inter text-white-primary ml-3 text-xl font-medium">
-               {routeLabels.find((e) => pathname.includes(e[0]))?.at(1) ?? ""}
+               {links.find((e) => pathname.includes(e.route))?.label ?? ""}
             </p>
          </header>
 
