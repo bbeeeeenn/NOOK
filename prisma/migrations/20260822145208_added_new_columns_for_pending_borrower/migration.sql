@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE "PendingRegistration" ADD COLUMN     "lastBorrowDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-ADD COLUMN     "timesBorrowed" INTEGER NOT NULL DEFAULT 1;

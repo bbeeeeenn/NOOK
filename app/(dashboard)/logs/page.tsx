@@ -2,7 +2,7 @@ import FallbackRow from "@/components/table/fallbackRow";
 import Table from "@/components/table/table";
 import TableRow from "@/components/table/tableRow";
 import { adminLoginPage } from "@/constants";
-import getLogsWithBorrower from "@/data-access-layer/BorrowLogsWithBorrower";
+import getLogsWithBorrower from "@/data-access-layer/BorrowLogs";
 import toPHDateString from "@/lib/toPHDateString";
 import { endOfDay, parseISO, startOfDay } from "date-fns";
 import { redirect } from "next/navigation";

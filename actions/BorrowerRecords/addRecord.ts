@@ -20,10 +20,10 @@ export default async function addBorrowerRecord(
       return { ok: false, error: "AUTH", message: "Unauthorized" };
 
    try {
-      const pendingRegistration = await prisma.pendingRegistration.findUnique({
+      const pendingRegistration = await prisma.pendingBorrowLog.findMany({
          where: { idNumber: idNumber.trim() },
       });
-      if (pendingRegistration)
+      if (pendingRegistration.length > 0)
          return await registerPendingBorrower(
             idNumber,
             name,
@@ -31,7 +31,6 @@ export default async function addBorrowerRecord(
             program,
             college,
          );
-
       const newRecord = await prisma.borrower.create({
          data: {
             idNumber: idNumber.trim(),
@@ -53,7 +52,11 @@ export default async function addBorrowerRecord(
                error: "AUTH",
                message: "Record with that ID Number already exists",
             };
-         return { ok: false, error: "DATABASE", message: e.message };
+         return {
+            ok: false,
+            error: "DATABASE",
+            message: `Database error: ${e.code}`,
+         };
       }
       console.error(e);
       return { ok: false, error: "OTHER", message: "Unexpected error occured" };

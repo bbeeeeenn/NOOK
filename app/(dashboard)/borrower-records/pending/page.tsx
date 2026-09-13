@@ -1,11 +1,11 @@
 import FallbackRow from "@/components/table/fallbackRow";
 import Table from "@/components/table/table";
 import { adminLoginPage } from "@/constants";
-import { getPendingBorrowerRecords } from "@/data-access-layer/PendingBorrowerRecords";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import PendingBorrowerRows from "./PendingBorrowerRows";
 import { File } from "lucide-react";
+import { getPendingBorrowerRecords } from "@/data-access-layer/PendingBorrowerRecords";
+import PendingBorrowerRows from "./PendingBorrowerRows";
 
 async function Suspended() {
    const pendingRecords = await getPendingBorrowerRecords();
@@ -33,12 +33,7 @@ export default function PendingRegistrationPage() {
    return (
       <div className="mt-2 overflow-x-auto">
          <Table
-            headers={[
-               "ID-Number",
-               "Times borrowed",
-               "Last borrow date",
-               "Action",
-            ]}
+            headers={["ID-Number", "Times borrowed", "Action"]}
             extraStyling="min-w-150"
          >
             <Suspense fallback={<FallbackRow />}>

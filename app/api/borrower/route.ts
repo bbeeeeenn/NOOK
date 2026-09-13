@@ -57,7 +57,7 @@ export async function GET(
 }
 
 async function getBorrower(idNumberQuery: string) {
-   "use cache";
+   "use cache: remote";
    cacheLife("days");
    cacheTag(`borrower:${idNumberQuery}`);
 

@@ -45,7 +45,11 @@ export default async function editBorrowerRecord(
                error: "AUTH",
                message: "Borrower record with such id not found",
             };
-         return { ok: false, error: "DATABASE", message: e.message };
+         return {
+            ok: false,
+            error: "DATABASE",
+            message: `Database error: ${e.code}`,
+         };
       }
       console.error(e);
       return { ok: false, error: "OTHER", message: "Unexpected error occured" };

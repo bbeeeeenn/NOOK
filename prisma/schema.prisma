@@ -33,8 +33,22 @@ model BorrowLog {
   bookBarcode String
   bookTitle   String?
   bookAuthor  String?
-  callNumber  String?
-  copies      Int?
+
+  borrower Borrower @relation(fields: [idNumber], references: [idNumber])
+
+  @@index([date])
+  @@index([idNumber, date])
+}
+
+model PendingBorrowLog {
+  id String @id @default(cuid())
+
+  date        DateTime @default(now())
+  idNumber    String
+  bookBarcode String
+  bookTitle   String?
+  bookAuthor  String?
+  tableRange  String?
 
   @@index([date])
   @@index([idNumber, date])
@@ -50,14 +64,7 @@ model Borrower {
   college   String
   createdAt DateTime @default(now())
 
+  borrowLogs BorrowLog[]
+
   @@index([createdAt])
-}
-
-model PendingRegistration {
-  id Int @id @default(autoincrement())
-
-  idNumber       String   @unique
-  timesBorrowed  Int      @default(1)
-  lastBorrowDate DateTime @default(now())
-  tableRanges    String[] // List of sheet range where inputs for student infos were temporarily emptied.
 }

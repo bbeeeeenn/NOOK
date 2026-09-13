@@ -1,7 +1,5 @@
 "use client";
 import TableRow from "@/components/table/tableRow";
-import { PendingRegistrationModel } from "@/generated/prisma/models";
-import toPHDateString from "@/lib/toPHDateString";
 import useIsMounted from "@/lib/useIsMounted";
 import ReactDOM from "react-dom";
 import ProgramDropdown from "../_components/ProgramDropdown";
@@ -13,9 +11,9 @@ import { LoaderCircle, X } from "lucide-react";
 import { toast } from "react-toastify";
 import { programs } from "@/constants";
 import registerPendingBorrower from "@/actions/PendingRegistration/registerPendingBorrower";
+import { Prisma } from "@/generated/prisma/client";
 
 type BorrowerInfo = {
-   id: number;
    name: string;
    idNumber: string;
    yearLevel: number;
@@ -26,14 +24,18 @@ type BorrowerInfo = {
 export default function PendingBorrowerRows({
    pendingRecords,
 }: {
-   pendingRecords: PendingRegistrationModel[];
+   pendingRecords: (Prisma.PickEnumerable<
+      Prisma.PendingBorrowLogGroupByOutputType,
+      "idNumber"[]
+   > & {
+      _count: number;
+   })[];
 }) {
    const isMounted = useIsMounted();
    const pendingRegistrationDialogRef = useRef<HTMLDialogElement>(null);
    const { desktop } = useSidebar();
 
    const [infos, setInfos] = useState<BorrowerInfo>({
-      id: -1,
       name: "",
       idNumber: "",
       yearLevel: 0,
@@ -93,17 +95,15 @@ export default function PendingBorrowerRows({
       <>
          {pendingRecords.map((p, i) => (
             <TableRow
-               key={p.id}
+               key={p.idNumber}
                index={i}
                data={[
                   p.idNumber,
-                  p.timesBorrowed,
-                  toPHDateString(p.lastBorrowDate),
+                  p._count,
                   <>
                      <button
                         onClick={() =>
                            onRegister({
-                              id: p.id,
                               idNumber: p.idNumber,
                               name: "",
                               yearLevel: 1,

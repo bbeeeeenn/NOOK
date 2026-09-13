@@ -27,10 +27,23 @@ export default async function deleteBorrowerRecord(
          if (e.code === "P2025")
             return {
                ok: false,
-               error: "AUTH",
+               error: "NOT_FOUND",
                message: "Borrower record with such id not found",
             };
-         return { ok: false, error: "DATABASE", message: e.message };
+         if (e.code === "P2003") {
+            return {
+               ok: false,
+               error: "CONFLICT",
+               message:
+                  "This record can't be deleted because it has connected logs",
+            };
+         }
+         console.error(e);
+         return {
+            ok: false,
+            error: "DATABASE",
+            message: `Database error: ${e.code}`,
+         };
       }
       console.error(e);
       return { ok: false, error: "OTHER", message: "Unexpected error occured" };

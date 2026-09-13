@@ -5,7 +5,7 @@ import {
    pendingBorrowerRecordPage,
    topBorrowersPage,
 } from "@/constants";
-import { updateCachedPendingBorrowerRecordsCount } from "@/data-access-layer/PendingBorrowerRecords";
+import { updatePendingBorrowerRecordsCache } from "@/data-access-layer/PendingBorrowerRecords";
 import { auth } from "@/lib/auth";
 import { fetchBook, normalizeIsbn } from "@/lib/fetchBook";
 import getSpreadsheetId from "@/lib/getSpreadsheetId";
@@ -14,6 +14,8 @@ import { prisma } from "@/lib/prisma";
 import toPHDateString from "@/lib/toPHDateString";
 import { Result } from "@/lib/types";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
+import { GaxiosError } from "gaxios";
+import { isAxiosError } from "axios";
 import { sheets_v4 } from "googleapis";
 import { revalidatePath } from "next/cache";
 
@@ -39,7 +41,13 @@ export default async function createBorrowLog(
       const book = normalizedISBN ? await fetchBook(normalizedISBN) : null;
       const existingBorrowerRecord = await prisma.borrower.findUnique({
          where: { idNumber: idNumber.trim() },
-         select: { name: true, program: true, college: true, yearLevel: true },
+         select: {
+            name: true,
+            program: true,
+            college: true,
+            yearLevel: true,
+            idNumber: true,
+         },
       });
       const spreadsheetId = await getSpreadsheetId(session.user.id);
       if (!spreadsheetId)
@@ -62,32 +70,28 @@ export default async function createBorrowLog(
          ],
       ]);
 
-      if (!existingBorrowerRecord) {
-         await prisma.pendingRegistration.upsert({
-            create: {
-               idNumber: idNumber.trim(),
-               tableRanges: { set: [appendResponse?.range ?? ""] },
+      if (existingBorrowerRecord) {
+         await prisma.borrowLog.create({
+            data: {
+               idNumber: existingBorrowerRecord.idNumber,
+               bookBarcode: bookCode,
+               bookTitle: book?.title,
+               bookAuthor: book?.authors,
             },
-            update: {
-               tableRanges: { push: appendResponse?.range },
-               lastBorrowDate: dateNow,
-               timesBorrowed: { increment: 1 },
+         });
+      } else {
+         await prisma.pendingBorrowLog.create({
+            data: {
+               idNumber,
+               bookBarcode: bookCode,
+               bookTitle: book?.title,
+               bookAuthor: book?.authors,
+               tableRange: appendResponse?.range,
             },
-            where: { idNumber },
          });
          revalidatePath(pendingBorrowerRecordPage);
-         updateCachedPendingBorrowerRecordsCount();
+         updatePendingBorrowerRecordsCache();
       }
-
-      await prisma.borrowLog.create({
-         data: {
-            date: dateNow,
-            idNumber: idNumber.trim(),
-            bookBarcode: bookCode,
-            bookTitle: book?.title,
-            bookAuthor: book?.authors,
-         },
-      });
 
       revalidatePath(logsPage);
       revalidatePath(topBorrowersPage);
@@ -102,11 +106,44 @@ export default async function createBorrowLog(
       };
    } catch (e) {
       console.error(e);
+      if (e instanceof GaxiosError) {
+         const status = e.response?.status;
+         if (status === 400)
+            return {
+               ok: false,
+               error: "VALIDATION",
+               message: "The spreadsheet request was invalid.",
+            };
+         if (status === 403)
+            return {
+               ok: false,
+               error: "FORBIDDEN",
+               message: "The service account can't access this spreadsheet.",
+            };
+         if (status === 404)
+            return {
+               ok: false,
+               error: "NOT_FOUND",
+               message: "The spreadsheet could not be found.",
+            };
+         if (status === 429)
+            return {
+               ok: false,
+               error: "RATE_LIMITED",
+               message:
+                  "Too many spreadsheet requests. Please try again shortly.",
+            };
+         return {
+            ok: false,
+            error: "OTHER",
+            message: "The spreadsheet service is unavailable right now.",
+         };
+      }
       if (e instanceof PrismaClientKnownRequestError) {
          if (e.code === "P2002") {
             return {
                ok: false,
-               error: "DATABASE",
+               error: "CONFLICT",
                message:
                   "A conflicting record already exists. Please try again.",
             };
@@ -114,16 +151,23 @@ export default async function createBorrowLog(
          if (e.code === "P2025") {
             return {
                ok: false,
-               error: "DATABASE",
+               error: "NOT_FOUND",
                message: "Related record not found.",
             };
          }
          return {
             ok: false,
             error: "DATABASE",
-            message: `Database error (${e.code}).`,
+            message: `Database error: ${e.code}`,
          };
       }
+
+      if (isAxiosError(e))
+         return {
+            ok: false,
+            error: "OTHER",
+            message: "Book details are unavailable right now.",
+         };
 
       if (e instanceof Error) {
          return { ok: false, error: "OTHER", message: e.message };
@@ -215,26 +259,14 @@ async function appendToCurrentMonthSheet(
    spreadsheetId: string,
    values: (string | number)[][],
 ): Promise<{ range: string } | null> {
-   let sheetName: string;
-   try {
-      sheetName = await getOrCreateMonthSheet(sheetsService, spreadsheetId);
-   } catch (e) {
-      console.error("Failed to get/create month sheet:", e);
-      throw new Error("Could not prepare sheet for append");
-   }
+   const sheetName = await getOrCreateMonthSheet(sheetsService, spreadsheetId);
+   const res = await sheetsService.spreadsheets.values.append({
+      spreadsheetId,
+      range: `${sheetName}!A:A`,
+      valueInputOption: "USER_ENTERED",
+      insertDataOption: "OVERWRITE",
+      requestBody: { values },
+   });
 
-   try {
-      const res = await sheetsService.spreadsheets.values.append({
-         spreadsheetId,
-         range: `${sheetName}!A:A`,
-         valueInputOption: "USER_ENTERED",
-         insertDataOption: "OVERWRITE",
-         requestBody: { values },
-      });
-
-      return { range: res.data.updates?.updatedRange ?? "" };
-   } catch (e) {
-      console.error("Failed to append row:", e);
-      throw new Error("Could not append data to sheet");
-   }
+   return { range: res.data.updates?.updatedRange ?? "" };
 }

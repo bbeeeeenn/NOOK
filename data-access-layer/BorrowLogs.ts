@@ -1,58 +1,88 @@
-// import { Prisma } from "@/generated/prisma/client";
-// // import { auth } from "@/lib/auth";
-// import { prisma } from "@/lib/prisma";
-// import { cacheLife } from "next/cache";
-// import type { Result } from "@/lib/types";
-// import { BorrowLogModel } from "@/generated/prisma/models";
+import { Prisma } from "@/generated/prisma/client";
+import { BorrowLogGetPayload } from "@/generated/prisma/models";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { Result } from "@/lib/types";
 
-// export async function getBorrowLogs(
-//    idNumber?: string,
-//    from?: Date,
-//    to?: Date,
-// ): Promise<Result<BorrowLogModel[]>> {
-//    // const session = await auth();
-//    // if (!session?.user) {
-//    //    return { ok: false, error: "AUTH", message: "Unauthorized" };
-//    // }
+export const LOGS_PAGE_SIZE = 20;
 
-//    try {
-//       const logs = await getCachedBorrowLogs(idNumber, from, to);
-//       return { ok: true, data: logs };
-//    } catch (e) {
-//       console.error("Error on getBorrowLogs()", e);
-//       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-//          return {
-//             ok: false,
-//             error: "OTHER",
-//             message: `Database error (${e.code})`,
-//          };
-//       }
-//       return { ok: false, error: "OTHER", message: "Unexpected error" };
-//    }
-// }
+type BorrowLog = BorrowLogGetPayload<{
+   include: { borrower: true };
+}>;
 
-// async function getCachedBorrowLogs(
-//    idNumber?: string,
-//    from?: Date,
-//    to?: Date,
-// ): Promise<BorrowLogModel[]> {
-//    "use cache";
-//    cacheLife("minutes");
+export type PaginatedBorrowLogs = {
+   logs: BorrowLog[];
+   total: number;
+};
 
-//    return prisma.borrowLog.findMany({
-//       where: {
-//          idNumber,
-//          ...(from || to
-//             ? {
-//                  date: {
-//                     gte: from,
-//                     lte: to,
-//                  },
-//               }
-//             : {}),
-//       },
-//       orderBy: {
-//          date: "desc",
-//       },
-//    });
-// }
+export default async function getLogsWithBorrower(
+   idNumber?: string,
+   from?: Date,
+   to?: Date,
+   page = 1,
+   pageSize = LOGS_PAGE_SIZE,
+): Promise<Result<PaginatedBorrowLogs>> {
+   const session = await auth();
+   if (!session?.user) {
+      return { ok: false, error: "AUTH", message: "Unauthorized" };
+   }
+
+   try {
+      const logsWithBorrower = await getCachedLogsWithBorrower(
+         page,
+         pageSize,
+         idNumber,
+         from,
+         to,
+      );
+      return { ok: true, data: logsWithBorrower };
+   } catch (e) {
+      console.error("Error on getBorrowLogs()", e);
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+         return {
+            ok: false,
+            error: "OTHER",
+            message: `Database error (${e.code})`,
+         };
+      }
+      return { ok: false, error: "OTHER", message: "Unexpected error" };
+   }
+}
+
+async function getCachedLogsWithBorrower(
+   page: number,
+   pageSize: number,
+   idNumber?: string,
+   from?: Date,
+   to?: Date,
+): Promise<PaginatedBorrowLogs> {
+   // "use cache";
+   // cacheLife("days");
+
+   const where = {
+      idNumber,
+      ...(from || to
+         ? {
+              date: {
+                 gte: from,
+                 lte: to,
+              },
+           }
+         : {}),
+   };
+   const [total, logs] = await Promise.all([
+      prisma.borrowLog.count({ where }),
+      prisma.borrowLog.findMany({
+         where,
+         orderBy: [{ date: "desc" }, { id: "desc" }],
+         skip: (page - 1) * pageSize,
+         take: pageSize,
+         include: { borrower: true },
+      }),
+   ]);
+
+   return {
+      total,
+      logs,
+   };
+}

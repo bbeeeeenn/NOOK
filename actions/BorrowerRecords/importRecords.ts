@@ -42,7 +42,7 @@ export default async function importRecords(
    const client = await pool.connect(); // initialize the client
 
    try {
-      const pendingRegistrationCount = await prisma.pendingRegistration.count();
+      const pendingRegistrationCount = await prisma.pendingBorrowLog.count();
       if (pendingRegistrationCount > 0)
          return {
             ok: false,
@@ -119,7 +119,11 @@ export default async function importRecords(
 
       if (err instanceof PrismaClientKnownRequestError) {
          console.error(err);
-         return { ok: false, error: "DATABASE", message: "Prisma error" };
+         return {
+            ok: false,
+            error: "DATABASE",
+            message: `Database error: ${err.code}`,
+         };
       }
       if (err instanceof PrismaClientValidationError) {
          return {

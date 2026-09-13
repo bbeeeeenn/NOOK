@@ -1,7 +1,6 @@
 "use server";
 
 import { borrowerRecordsPage, pendingBorrowerRecordPage } from "@/constants";
-import { updateCachedPendingBorrowerRecordsCount } from "@/data-access-layer/PendingBorrowerRecords";
 import { auth } from "@/lib/auth";
 import getSpreadsheetId from "@/lib/getSpreadsheetId";
 import { sheetsService } from "@/lib/googlesheetsapi";
@@ -26,10 +25,10 @@ export default async function registerPendingBorrower(
       return { ok: false, error: "AUTH", message: "Unauthorized" };
 
    try {
-      const pendingRegistration = await prisma.pendingRegistration.findUnique({
+      const pendingBorrowLogs = await prisma.pendingBorrowLog.findMany({
          where: { idNumber: normalizedIdNumber },
       });
-      if (!pendingRegistration)
+      if (pendingBorrowLogs.length === 0)
          return {
             ok: false,
             error: "NOT_FOUND",
@@ -40,9 +39,9 @@ export default async function registerPendingBorrower(
 
       const newRecord = await prisma.$transaction(
          async (tx) => {
-            const record = await tx.borrower.create({
+            const newBorrowerRecord = await tx.borrower.create({
                data: {
-                  idNumber: pendingRegistration.idNumber,
+                  idNumber: normalizedIdNumber,
                   name: normalizedName,
                   yearLevel: program === "INSTRUCTOR" ? 0 : yearLevel,
                   program,
@@ -51,16 +50,26 @@ export default async function registerPendingBorrower(
                select: { idNumber: true },
             });
 
-            await tx.pendingRegistration.delete({
-               where: { id: pendingRegistration.id },
+            await tx.borrowLog.createMany({
+               data: pendingBorrowLogs.map((pbl) => ({
+                  idNumber: newBorrowerRecord.idNumber,
+                  bookBarcode: pbl.bookBarcode,
+                  bookTitle: pbl.bookTitle,
+                  bookAuthor: pbl.bookAuthor,
+                  date: pbl.date,
+               })),
+            });
+
+            await tx.pendingBorrowLog.deleteMany({
+               where: { idNumber: pendingBorrowLogs[0].idNumber },
             });
 
             await sheetsService.spreadsheets.values.batchUpdate({
                spreadsheetId,
                requestBody: {
                   valueInputOption: "USER_ENTERED",
-                  data: pendingRegistration.tableRanges.map((range) => ({
-                     range,
+                  data: pendingBorrowLogs.map((pbl) => ({
+                     range: pbl.tableRange,
                      values: [
                         [
                            null,
@@ -75,14 +84,13 @@ export default async function registerPendingBorrower(
                },
             });
 
-            return record;
+            return newBorrowerRecord;
          },
          { timeout: 10000 },
       );
 
       revalidatePath(borrowerRecordsPage);
       revalidatePath(pendingBorrowerRecordPage);
-      updateCachedPendingBorrowerRecordsCount();
 
       return {
          ok: true,
@@ -142,7 +150,11 @@ export default async function registerPendingBorrower(
                error: "CONFLICT",
                message: "Record with that ID Number already exists",
             };
-         return { ok: false, error: "DATABASE", message: e.message };
+         return {
+            ok: false,
+            error: "DATABASE",
+            message: `Database error: ${e.code}`,
+         };
       }
       console.error(e);
       return {
