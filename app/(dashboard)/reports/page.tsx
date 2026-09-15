@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 type SearchParameters = Promise<{ month?: string }>;
+const reportTitle = "In-house utilization per college and other library users";
 
 function getSelectedMonth(month?: string) {
    const parsed = month ? parse(month, "yyyy-MM", new Date()) : new Date();
@@ -16,7 +17,51 @@ function getSelectedMonth(month?: string) {
       : new Date();
 }
 
+function ReportSkeleton() {
+   return (
+      <div className="animate-pulse" aria-busy="true">
+         <div className="mb-4 flex items-end gap-2">
+            <div className="flex flex-col gap-1">
+               <div className="h-4 w-12 rounded bg-gray-200" />
+               <div className="h-9 w-36 rounded-md bg-gray-200" />
+            </div>
+            <div className="h-9 w-24 rounded-md bg-gray-200" />
+         </div>
+         <Table headers={["COLLEGE", "NO. OF TITLES USED"]}>
+            {Array.from({ length: 9 }, (_, index) => (
+               <TableRow
+                  key={index}
+                  index={index}
+                  data={[
+                     <div
+                        key="college"
+                        className="mx-auto h-4 w-2/3 rounded bg-gray-200"
+                     />,
+                     <div
+                        key="count"
+                        className="mx-auto h-4 w-8 rounded bg-gray-200"
+                     />,
+                  ]}
+               />
+            ))}
+            <TableRow
+               index={9}
+               data={[
+                  <div key="total" className="h-5 w-16 rounded bg-gray-200" />,
+                  <div
+                     key="total-count"
+                     className="mx-auto h-5 w-10 rounded bg-gray-200"
+                  />,
+               ]}
+               styles="font-bold text-base"
+            />
+         </Table>
+      </div>
+   );
+}
+
 async function Suspended({ searchParams }: { searchParams: SearchParameters }) {
+   await new Promise((resolve) => setTimeout(resolve, 2000));
    const { month } = await searchParams;
    const selectedMonth = getSelectedMonth(month);
    const counts = await getCollegeBorrowerCounts(
@@ -90,7 +135,10 @@ export default async function ReportsPage({
 }) {
    return (
       <div className="p-4">
-         <Suspense fallback={"Loading..."}>
+         <h1 className="font-inter my-3 text-center text-xl font-bold uppercase">
+            {reportTitle}
+         </h1>
+         <Suspense fallback={<ReportSkeleton />}>
             <Suspended searchParams={searchParams} />
          </Suspense>
       </div>

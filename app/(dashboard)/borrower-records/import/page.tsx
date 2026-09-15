@@ -1,7 +1,7 @@
 "use client";
 
 import importRecords from "@/actions/BorrowerRecords/importRecords";
-import { Download, FileSpreadsheet, LoaderCircle } from "lucide-react";
+import { Download, LoaderCircle } from "lucide-react";
 import { useActionState, useState } from "react";
 import { toast } from "react-toastify";
 
