@@ -1,7 +1,7 @@
 "use client";
 
 import importRecords from "@/actions/BorrowerRecords/importRecords";
-import { Download, LoaderCircle } from "lucide-react";
+import { Download, FileSpreadsheet, LoaderCircle } from "lucide-react";
 import { useActionState, useState } from "react";
 import { toast } from "react-toastify";
 
@@ -36,75 +36,110 @@ export default function ImportPage() {
    const [, formAction, isPending] = useActionState(onAction, null);
 
    return (
-      <div className="font-inter mx-auto mt-4 px-2 text-gray-700 select-none">
-         <h1 className="text-xl font-semibold">Import Student Record</h1>
+      <div className="font-inter px-4 py-4 text-gray-700 select-none sm:px-6">
+         <div className="mb-6 flex items-start gap-3">
+            <div>
+               <h1 className="mt-1 text-2xl font-semibold tracking-tight text-gray-900">
+                  Import student records
+               </h1>
+               <p className="mt-1 max-w-xl text-sm leading-6 text-gray-500">
+                  Pull student data directly from your Google Sheet using its
+                  sheet name and cell range.
+               </p>
+            </div>
+         </div>
+
          <form
             action={formAction}
-            className="mt-2 space-y-2"
+            className="space-y-5"
             onSubmit={(e) => {
                if (isPending) e.preventDefault();
                setError("");
             }}
          >
-            <div>
-               <label htmlFor="sheetname" className="block text-sm">
-                  Sheet name
-               </label>
-               <input
-                  spellCheck={false}
-                  type="text"
-                  id="sheetname"
-                  value={info.sheetName}
-                  onChange={(e) =>
-                     setInfo((prev) => ({
-                        ...prev,
-                        sheetName: e.target.value,
-                     }))
-                  }
-                  placeholder="e.g. Sheet1"
-                  required
-                  className="w-full max-w-125 self-stretch rounded-lg border border-gray-400 px-2 py-2 placeholder:select-none focus:outline-0"
-               />
+            <div className="grid gap-5 sm:grid-cols-[1.4fr_1fr]">
+               <div>
+                  <label
+                     htmlFor="sheetname"
+                     className="block text-sm font-medium text-gray-800"
+                  >
+                     Sheet name
+                  </label>
+                  <p className="mt-1 text-xs text-gray-500">
+                     The tab containing the records
+                  </p>
+                  <input
+                     spellCheck={false}
+                     type="text"
+                     id="sheetname"
+                     value={info.sheetName}
+                     onChange={(e) =>
+                        setInfo((prev) => ({
+                           ...prev,
+                           sheetName: e.target.value,
+                        }))
+                     }
+                     placeholder="e.g. Sheet1"
+                     required
+                     className="mt-2 h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm transition-colors placeholder:text-gray-400"
+                  />
+               </div>
+               <div>
+                  <label
+                     htmlFor="range"
+                     className="block text-sm font-medium text-gray-800"
+                  >
+                     Range
+                  </label>
+                  <p className="mt-1 text-xs text-gray-500">
+                     Cells to import, including headers
+                  </p>
+                  <input
+                     spellCheck={false}
+                     type="text"
+                     id="range"
+                     value={info.range}
+                     onChange={(e) =>
+                        setInfo((prev) => ({
+                           ...prev,
+                           range: e.target.value,
+                        }))
+                     }
+                     placeholder="e.g. A1:E20"
+                     required
+                     className="mt-2 h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm transition-colors placeholder:text-gray-400"
+                  />
+               </div>
             </div>
-            <div>
-               <label htmlFor="range" className="block text-sm">
-                  Range
-               </label>
-               <input
-                  spellCheck={false}
-                  type="text"
-                  id="range"
-                  value={info.range}
-                  onChange={(e) =>
-                     setInfo((prev) => ({ ...prev, range: e.target.value }))
-                  }
-                  placeholder="e.g. A1:E20"
-                  required
-                  className="w-full max-w-50 self-stretch rounded-lg border border-gray-400 px-2 py-2 placeholder:select-none focus:outline-0"
-               />
-            </div>
-            <button
-               disabled={isPending}
-               className="font-roboto bg-yellow-primary mt-4 flex items-center gap-2 rounded-lg px-4 py-2 font-medium shadow-sm"
-            >
-               {isPending ? (
-                  <>
-                     <span>
-                        <LoaderCircle className="animate-spin" />
-                     </span>{" "}
-                     Import
-                  </>
-               ) : (
-                  <>
-                     <span>
+            <div className="flex flex-col gap-3 border-t border-gray-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
+               <p className="text-xs leading-5 text-gray-500">
+                  Make sure the sheet columns match the borrower record format.
+               </p>
+               <button
+                  type="submit"
+                  disabled={isPending}
+                  className="font-roboto bg-yellow-primary flex h-11 items-center justify-center gap-2 rounded-lg px-5 font-medium text-gray-900 shadow-sm transition hover:shadow-md hover:brightness-105 active:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
+               >
+                  {isPending ? (
+                     <>
+                        <LoaderCircle className="animate-spin" size={18} />
+                        Import
+                     </>
+                  ) : (
+                     <>
                         <Download size={17} />
-                     </span>{" "}
-                     Import
-                  </>
-               )}
-            </button>
+                        Import
+                     </>
+                  )}
+               </button>
+            </div>
             {error && (
-               <p className={"text-sm font-medium text-red-800"}>{error}</p>
+               <p
+                  role="alert"
+                  className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-800"
+               >
+                  {error}
+               </p>
             )}
          </form>
       </div>

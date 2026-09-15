@@ -262,11 +262,19 @@ export const colleges = [
       desc: "College of Humanities and Social Sciences",
    },
    {
-      shorthand: "CM",
-      desc: "College of Medicine",
+      shorthand: "FACULTY",
+      desc: "FACULTY",
    },
    {
-      shorthand: "INSTRUCTOR",
-      desc: "INSTRUCTOR",
+      shorthand: "VISITOR",
+      desc: "VISITOR",
+   },
+   {
+      shorthand: "GRADUATE SCHOOL",
+      desc: "GRADUATE SCHOOL",
+   },
+   {
+      shorthand: "SCHOOL OF MEDICINE",
+      desc: "College of Medicine",
    },
 ];
