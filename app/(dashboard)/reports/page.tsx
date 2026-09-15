@@ -61,7 +61,6 @@ function ReportSkeleton() {
 }
 
 async function Suspended({ searchParams }: { searchParams: SearchParameters }) {
-   await new Promise((resolve) => setTimeout(resolve, 2000));
    const { month } = await searchParams;
    const selectedMonth = getSelectedMonth(month);
    const counts = await getCollegeBorrowerCounts(
