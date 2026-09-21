@@ -1,6 +1,6 @@
 "use client";
 
-import { endOfDay, format, parseISO } from "date-fns";
+import { format, parseISO } from "date-fns";
 import {
    ChevronDownIcon,
    FilterIcon,
