@@ -1,21 +1,13 @@
 // Reference: https://next-auth.js.org/configuration/nextjs#getserversession
 
 import { adminLoginPage } from "@/constants";
-import type {
-   GetServerSidePropsContext,
-   NextApiRequest,
-   NextApiResponse,
-} from "next";
-import type { NextAuthOptions } from "next-auth";
-import { getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import { cache } from "react";
 import { prisma } from "./prisma";
 import { compareData } from "./bcrypt";
+import NextAuth, { NextAuthConfig } from "next-auth";
 
 export const authOptions = {
-   
    providers: [
       // Credentials Auth provider
       CredentialsProvider({
@@ -35,11 +27,15 @@ export const authOptions = {
                return null;
             }
             const user = await prisma.adminAccount.findUnique({
-               where: { username: credentials.username },
+               where: { username: credentials.username as string },
+               // where: { username: credentials.username },
             });
             if (
                !user ||
-               !(await compareData(credentials.password, user.password))
+               !(await compareData(
+                  credentials.password as string,
+                  user.password,
+               ))
             ) {
                return null;
             }
@@ -149,7 +145,7 @@ export const authOptions = {
          if (session.user) {
             session.user.id = token.id as string;
             session.user.name = token.name;
-            session.user.email = token.email;
+            session.user.email = token.email ?? session.user.email;
          }
          session.accessToken = token.accessToken as string;
          session.error = token.error as string | undefined;
@@ -164,15 +160,6 @@ export const authOptions = {
       error: adminLoginPage,
       signOut: adminLoginPage,
    },
-} satisfies NextAuthOptions;
+} satisfies NextAuthConfig;
 
-function _auth(
-   ...args:
-      | [GetServerSidePropsContext["req"], GetServerSidePropsContext["res"]]
-      | [NextApiRequest, NextApiResponse]
-      | []
-) {
-   return getServerSession(...args, authOptions);
-}
-
-export const auth = cache(_auth);
+export const { auth, signIn, signOut, handlers } = NextAuth(authOptions);
