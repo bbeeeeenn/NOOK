@@ -15,6 +15,7 @@ import { prisma } from "./prisma";
 import { compareData } from "./bcrypt";
 
 export const authOptions = {
+   
    providers: [
       // Credentials Auth provider
       CredentialsProvider({
@@ -49,6 +50,13 @@ export const authOptions = {
       GoogleProvider({
          clientId: process.env.AUTH_GOOGLE_CLIENT!,
          clientSecret: process.env.AUTH_GOOGLE_SECRET!,
+         authorization: {
+            params: {
+               scope: "openid email profile https://www.googleapis.com/auth/spreadsheets",
+               access_type: "offline",
+               prompt: "consent",
+            },
+         },
       }),
    ],
    callbacks: {
@@ -91,6 +99,49 @@ export const authOptions = {
             }
          }
 
+         // Store Google tokens on initial sign-in
+         if (account?.provider === "google") {
+            token.accessToken = account.access_token;
+            token.refreshToken = account.refresh_token;
+            token.expiresAt = account.expires_at; // seconds since epoch
+         }
+
+         // Refresh if expired
+         if (
+            token.expiresAt &&
+            Date.now() >= (token.expiresAt as number) * 1000 &&
+            token.refreshToken
+         ) {
+            try {
+               const res = await fetch("https://oauth2.googleapis.com/token", {
+                  method: "POST",
+                  headers: {
+                     "Content-Type": "application/x-www-form-urlencoded",
+                  },
+                  body: new URLSearchParams({
+                     client_id: process.env.AUTH_GOOGLE_CLIENT!,
+                     client_secret: process.env.AUTH_GOOGLE_SECRET!,
+                     grant_type: "refresh_token",
+                     refresh_token: token.refreshToken as string,
+                  }),
+               });
+               const refreshed = await res.json();
+               if (res.ok) {
+                  token.accessToken = refreshed.access_token;
+                  token.expiresAt =
+                     Math.floor(Date.now() / 1000) + refreshed.expires_in;
+                  // Google sometimes rotates the refresh token; keep it if returned
+                  if (refreshed.refresh_token) {
+                     token.refreshToken = refreshed.refresh_token;
+                  }
+               } else {
+                  token.error = "RefreshAccessTokenError";
+               }
+            } catch {
+               token.error = "RefreshAccessTokenError";
+            }
+         }
+
          return token;
       },
       // Session
@@ -100,6 +151,8 @@ export const authOptions = {
             session.user.name = token.name;
             session.user.email = token.email;
          }
+         session.accessToken = token.accessToken as string;
+         session.error = token.error as string | undefined;
          return session;
       },
    },
