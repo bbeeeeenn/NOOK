@@ -6,14 +6,16 @@ import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "./prisma";
 import { compareData } from "./bcrypt";
 import NextAuth, { NextAuthConfig } from "next-auth";
+import { PrismaAdapter } from "@auth/prisma-adapter";
 
 export const authOptions = {
+   adapter: PrismaAdapter(prisma),
    providers: [
       // Credentials Auth provider
       CredentialsProvider({
          credentials: {
-            username: {
-               type: "text",
+            email: {
+               type: "email",
                required: true,
             },
             password: {
@@ -23,15 +25,15 @@ export const authOptions = {
          },
          // Authorization logic
          async authorize(credentials) {
-            if (!credentials?.password || !credentials.username) {
+            if (!credentials?.password || !credentials.email) {
                return null;
             }
-            const user = await prisma.adminAccount.findUnique({
-               where: { username: credentials.username as string },
-               // where: { username: credentials.username },
+            const user = await prisma.user.findUnique({
+               where: { email: credentials.email as string },
             });
             if (
                !user ||
+               !user.password ||
                !(await compareData(
                   credentials.password as string,
                   user.password,
@@ -57,14 +59,12 @@ export const authOptions = {
    ],
    callbacks: {
       // Signin
-      async signIn({ user, account }) {
+      async signIn({ user, account, credentials }) {
          if (account?.provider === "google" && user.email) {
-            const userFromDb = await prisma.adminAccount.findUnique({
-               where: { email: user.email },
-               select: { id: true },
-            });
-
-            return !!userFromDb;
+            const allowEmails = process.env
+               .ALLOWED_EMAILS!.toLowerCase()
+               .split(";");
+            return allowEmails.includes(user.email);
          }
          return true;
       },
@@ -85,7 +85,7 @@ export const authOptions = {
             account?.provider === "google" &&
             user?.email
          ) {
-            const userFromDb = await prisma.adminAccount.findUnique({
+            const userFromDb = await prisma.user.findUnique({
                where: { email: user.email },
                select: { id: true, name: true },
             });
