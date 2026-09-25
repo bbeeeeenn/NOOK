@@ -1,7 +1,7 @@
 "use server";
 import { configurationsPage } from "@/constants";
 import { auth } from "@/lib/auth";
-import { sheetsService } from "@/lib/googlesheetsapi";
+import { getSheetService } from "@/lib/googlesheetsapi";
 import { prisma } from "@/lib/prisma";
 import { Result } from "@/lib/types";
 import { GaxiosError } from "gaxios";
@@ -28,6 +28,7 @@ export default async function setSheetIdAction(
       // Test the sheet
       const testRange = "A1";
 
+      const sheetsService = getSheetService(session);
       const existing = await sheetsService.spreadsheets.values.get({
          spreadsheetId: newSpreadsheetId,
          range: testRange,

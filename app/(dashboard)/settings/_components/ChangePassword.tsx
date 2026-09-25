@@ -76,7 +76,11 @@ const PasswordInput = ({
    );
 };
 
-export default function ChangePassword() {
+export default function ChangePassword({
+   noPassword,
+}: {
+   noPassword: boolean;
+}) {
    const [password, setPassword] = useState({
       current: "",
       new: "",
@@ -90,12 +94,15 @@ export default function ChangePassword() {
          toast.error("Passwords don't match");
          return;
       }
-      if (password.new.length < 8 || password.current.length < 8) {
+      if (
+         password.new.length < 8 ||
+         (!noPassword && password.current.length < 8)
+      ) {
          toast.error("Password must be at least 8 characters long");
          return;
       }
 
-      const res = await changePasswordAction(password.current, password.new);
+      const res = await changePasswordAction(password.new, password.current);
       if (!res.ok) {
          toast.error(res.message);
          return;
@@ -107,14 +114,16 @@ export default function ChangePassword() {
 
    return (
       <form action={formAction} className="font-inter mt-10 font-medium">
-         <PasswordInput
-            label="Current Password"
-            name="currentpassword"
-            value={password.current}
-            handler={(e) => {
-               setPassword((prev) => ({ ...prev, current: e.target.value }));
-            }}
-         />
+         {!noPassword && (
+            <PasswordInput
+               label="Current Password"
+               name="currentpassword"
+               value={password.current}
+               handler={(e) => {
+                  setPassword((prev) => ({ ...prev, current: e.target.value }));
+               }}
+            />
+         )}
          <PasswordInput
             label="New Password"
             name="newpassword"

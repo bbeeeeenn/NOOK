@@ -2,7 +2,6 @@
 
 import { borrowerRecordsPage, importBorrowerRecordsPage } from "@/constants";
 import { auth } from "@/lib/auth";
-import { sheetsService } from "@/lib/googlesheetsapi";
 import { prisma } from "@/lib/prisma";
 import { Result } from "@/lib/types";
 import {
@@ -17,6 +16,7 @@ import { pipeline } from "stream/promises";
 import { from as copyFrom } from "pg-copy-streams";
 import { Readable } from "stream";
 import cuid from "cuid";
+import { getSheetService } from "@/lib/googlesheetsapi";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
@@ -28,7 +28,7 @@ export default async function importRecords(
    if (!session?.user)
       return { ok: false, error: "AUTH", message: "Unauthorized" };
 
-   const user = await prisma.adminAccount.findUnique({
+   const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: { id: true, configuration: { select: { spreadsheetId: true } } },
    });
@@ -50,6 +50,7 @@ export default async function importRecords(
             message:
                "Please clear the pending registrations before continuing.",
          };
+      const sheetsService = getSheetService(session);
 
       const res = await sheetsService.spreadsheets.values.get({
          spreadsheetId: user.configuration.spreadsheetId!,

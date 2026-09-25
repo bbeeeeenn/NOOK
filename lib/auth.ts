@@ -59,7 +59,7 @@ export const authOptions = {
    ],
    callbacks: {
       // Signin
-      async signIn({ user, account, credentials }) {
+      async signIn({ user, account }) {
          if (account?.provider === "google" && user.email) {
             const allowEmails = process.env
                .ALLOWED_EMAILS!.toLowerCase()
@@ -69,7 +69,9 @@ export const authOptions = {
          return true;
       },
       // JWT
-      async jwt({ user, account, token, session, trigger }) {
+      async jwt({ user, account, token, session, trigger, profile }) {
+         token.error = undefined;
+
          if (user) {
             token.id = user.id;
          }
@@ -95,11 +97,57 @@ export const authOptions = {
             }
          }
 
-         // Store Google tokens on initial sign-in
+         // Store Google tokens on initial Google sign-in
          if (account?.provider === "google") {
             token.accessToken = account.access_token;
             token.refreshToken = account.refresh_token;
             token.expiresAt = account.expires_at; // seconds since epoch
+
+            // Capture the current profile picture and sync it to the DB
+            if (profile?.picture) {
+               token.picture = profile.picture as string;
+               if (token.id) {
+                  await prisma.user.update({
+                     where: { id: token.id as string },
+                     data: { image: profile.picture as string },
+                  });
+               }
+            }
+         }
+
+         // On credentials sign-in, pull any linked Google tokens from the DB
+         if (
+            trigger === "signIn" &&
+            account?.provider === "credentials" &&
+            token.id
+         ) {
+            const googleAccount = await prisma.account.findFirst({
+               where: {
+                  userId: token.id as string,
+                  provider: "google",
+               },
+               select: {
+                  access_token: true,
+                  refresh_token: true,
+                  expires_at: true,
+               },
+            });
+
+            if (googleAccount) {
+               token.accessToken = googleAccount.access_token ?? undefined;
+               token.refreshToken = googleAccount.refresh_token ?? undefined;
+               token.expiresAt = googleAccount.expires_at ?? undefined;
+            }
+
+            // Pull whatever image is currently stored, regardless of token state
+            const dbUser = await prisma.user.findUnique({
+               where: { id: token.id as string },
+               select: { image: true },
+            });
+
+            if (dbUser?.image) {
+               token.picture = dbUser.image;
+            }
          }
 
          // Refresh if expired
@@ -123,12 +171,48 @@ export const authOptions = {
                });
                const refreshed = await res.json();
                if (res.ok) {
+                  token.error = undefined;
                   token.accessToken = refreshed.access_token;
                   token.expiresAt =
                      Math.floor(Date.now() / 1000) + refreshed.expires_in;
-                  // Google sometimes rotates the refresh token; keep it if returned
                   if (refreshed.refresh_token) {
                      token.refreshToken = refreshed.refresh_token;
+                  }
+
+                  // keep the DB row in sync so future lookups get the fresh token
+                  await prisma.account.updateMany({
+                     where: { userId: token.id as string, provider: "google" },
+                     data: {
+                        access_token: refreshed.access_token,
+                        expires_at: token.expiresAt as number,
+                        ...(refreshed.refresh_token && {
+                           refresh_token: refreshed.refresh_token,
+                        }),
+                     },
+                  });
+
+                  // Pull the current picture along with the refreshed token
+                  try {
+                     const userinfoRes = await fetch(
+                        "https://www.googleapis.com/oauth2/v3/userinfo",
+                        {
+                           headers: {
+                              Authorization: `Bearer ${refreshed.access_token}`,
+                           },
+                        },
+                     );
+                     if (userinfoRes.ok) {
+                        const info = await userinfoRes.json();
+                        if (info.picture) {
+                           token.picture = info.picture;
+                           await prisma.user.update({
+                              where: { id: token.id as string },
+                              data: { image: info.picture },
+                           });
+                        }
+                     }
+                  } catch {
+                     // non-fatal, keep old picture
                   }
                } else {
                   token.error = "RefreshAccessTokenError";
@@ -146,6 +230,8 @@ export const authOptions = {
             session.user.id = token.id as string;
             session.user.name = token.name;
             session.user.email = token.email ?? session.user.email;
+            session.user.image =
+               (token.picture as string) ?? session.user.image;
          }
          session.accessToken = token.accessToken as string;
          session.error = token.error as string | undefined;

@@ -9,7 +9,6 @@ import { updatePendingBorrowerRecordsCache } from "@/data-access-layer/PendingBo
 import { auth } from "@/lib/auth";
 import { fetchBook, normalizeIsbn } from "@/lib/fetchBook";
 import getSpreadsheetId from "@/lib/getSpreadsheetId";
-import { sheetsService } from "@/lib/googlesheetsapi";
 import { prisma } from "@/lib/prisma";
 import toPHDateString from "@/lib/toPHDateString";
 import { Result } from "@/lib/types";
@@ -18,6 +17,7 @@ import { GaxiosError } from "gaxios";
 import { isAxiosError } from "axios";
 import { sheets_v4 } from "googleapis";
 import { revalidatePath } from "next/cache";
+import { getSheetService } from "@/lib/googlesheetsapi";
 
 export default async function createBorrowLog(
    idNumber: string,
@@ -56,19 +56,24 @@ export default async function createBorrowLog(
             error: "VALIDATION",
             message: "Please provide a spreadsheet ID before continuing.",
          };
-      const appendResponse = await appendToCurrentMonthSheet(spreadsheetId, [
+      const sheetService = getSheetService(session);
+      const appendResponse = await appendToCurrentMonthSheet(
+         sheetService,
+         spreadsheetId,
          [
-            phDateString,
-            idNumber,
-            existingBorrowerRecord?.name,
-            existingBorrowerRecord?.program,
-            existingBorrowerRecord?.yearLevel,
-            existingBorrowerRecord?.college,
-            bookCode,
-            book?.title,
-            book?.authors,
+            [
+               phDateString,
+               idNumber,
+               existingBorrowerRecord?.name,
+               existingBorrowerRecord?.program,
+               existingBorrowerRecord?.yearLevel,
+               existingBorrowerRecord?.college,
+               bookCode,
+               book?.title,
+               book?.authors,
+            ],
          ],
-      ]);
+      );
 
       if (existingBorrowerRecord) {
          await prisma.borrowLog.create({
@@ -226,7 +231,8 @@ async function getOrCreateMonthSheet(
                ],
             },
          });
-         await sheetsService.spreadsheets.values.append({
+
+         await sheets.spreadsheets.values.append({
             spreadsheetId,
             range: `${sheetName}!A:I`,
             valueInputOption: "USER_ENTERED",
@@ -256,11 +262,12 @@ async function getOrCreateMonthSheet(
 }
 
 async function appendToCurrentMonthSheet(
+   sheets: sheets_v4.Sheets,
    spreadsheetId: string,
    values: (string | number)[][],
 ): Promise<{ range: string } | null> {
-   const sheetName = await getOrCreateMonthSheet(sheetsService, spreadsheetId);
-   const res = await sheetsService.spreadsheets.values.append({
+   const sheetName = await getOrCreateMonthSheet(sheets, spreadsheetId);
+   const res = await sheets.spreadsheets.values.append({
       spreadsheetId,
       range: `${sheetName}!A:A`,
       valueInputOption: "USER_ENTERED",

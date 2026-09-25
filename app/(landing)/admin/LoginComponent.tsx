@@ -9,11 +9,10 @@ import {
    Square,
    SquareCheckBig,
 } from "lucide-react";
-import { signIn, useSession } from "next-auth/react";
-import Image from "next/image";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { SubmitEvent, useEffect, useState } from "react";
+import { SubmitEvent, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { toast } from "react-toastify";
 
