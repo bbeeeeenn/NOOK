@@ -1,29 +1,42 @@
 "use client";
-import { adminLoginPage } from "@/constants";
+import { adminLoginPage, homePage } from "@/constants";
 import clsx from "clsx";
 import { ChevronRight, Menu } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
 export default function Nav() {
    const [isOpen, setIsOpen] = useState(false);
    return (
-      <>
-         <nav className="bg-white-primary fixed inset-x-0 top-0 z-100 flex justify-between px-5 py-3.75 text-lg">
-            <p className="font-inter font-bold sm:hidden">Home</p>
+      <nav>
+         <div className="bg-white-primary fixed inset-x-0 top-0 z-100 flex justify-between px-5 py-3.75 text-lg sm:pl-10">
+            <Image
+               src={"/CSUBrandLogo.svg"}
+               alt="CSU LOGO"
+               width={200}
+               height={200}
+               className="h-10 w-auto"
+            />
             <button
                className="sm:hidden"
                onClick={() => setIsOpen((prev) => !prev)}
             >
                <Menu />
             </button>
-            <div className="font-inter hidden grow justify-end gap-10 px-5 sm:flex">
-               <button className="w-19 text-center hover:font-bold hover:text-[#FBBC05]">
+            <div className="font-inter hidden grow items-center justify-end gap-10 px-5 sm:flex">
+               <Link
+                  href={homePage}
+                  className="w-19 text-center hover:font-bold hover:text-[#FBBC05]"
+               >
                   Home
-               </button>
-               <button className="w-19 text-center hover:font-bold hover:text-[#FBBC05]">
+               </Link>
+               <Link
+                  href={"/"}
+                  className="w-19 text-center hover:font-bold hover:text-[#FBBC05]"
+               >
                   Search
-               </button>
+               </Link>
                <Link
                   href={adminLoginPage}
                   className="w-19 text-center hover:font-bold hover:text-[#FBBC05]"
@@ -31,15 +44,18 @@ export default function Nav() {
                   Admin
                </Link>
             </div>
-         </nav>
-         <nav
+         </div>
+
+         {/* Mobile */}
+         <div
             className={clsx(
                "font-inter bg-white-primary fixed inset-x-0 top-14 overflow-y-hidden text-lg font-medium shadow-md transition-[height] duration-300 sm:hidden",
                isOpen ? "h-39" : "h-0",
             )}
+            onClick={() => setIsOpen(false)}
          >
             <Link
-               href={"/"}
+               href={homePage}
                className="relative block w-full py-3 text-center active:bg-gray-100"
             >
                Home
@@ -65,7 +81,7 @@ export default function Nav() {
                   <ChevronRight />
                </span>
             </Link>
-         </nav>
-      </>
+         </div>
+      </nav>
    );
 }

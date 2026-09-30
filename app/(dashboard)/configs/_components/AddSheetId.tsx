@@ -2,18 +2,12 @@
 
 import setSheetIdAction from "@/actions/Configurations/SetSheetId";
 import clsx from "clsx";
-import { Copy, Link, LoaderCircle } from "lucide-react";
+import { Link, LoaderCircle } from "lucide-react";
 import Image from "next/image";
 import { useActionState, useState } from "react";
 import { toast } from "react-toastify";
 
-export function AddSheetId({
-   serviceAccountEmail,
-   currentId,
-}: {
-   serviceAccountEmail: string;
-   currentId: string;
-}) {
+export function AddSheetId({ currentId }: { currentId: string }) {
    const [sheetIdInput, setSheetIdInput] = useState(currentId);
    const edited = currentId !== sheetIdInput;
 
@@ -91,19 +85,8 @@ export function AddSheetId({
             </li>
             <li>Paste that ID into the field above.</li>
             <li>
-               Make sure the sheet is shared with this email{" "}
-               <strong
-                  className="cursor-pointer bg-gray-100 break-all hover:underline"
-                  onClick={async () => {
-                     await navigator.clipboard.writeText(serviceAccountEmail);
-                     toast.info("Copied to clipboard");
-                  }}
-               >
-                  {serviceAccountEmail}
-                  <Copy size={10} className="mb-0.5 ml-0.5 inline" />
-               </strong>{" "}
-               with at least Editor access, or the API won&apos;t be able to
-               modify it.
+               Make sure the sheet is shared with your email with at least
+               Editor access.
             </li>
          </ol>
       </form>

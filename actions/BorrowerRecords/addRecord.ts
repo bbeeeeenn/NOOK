@@ -20,17 +20,20 @@ export default async function addBorrowerRecord(
       return { ok: false, error: "AUTH", message: "Unauthorized" };
 
    try {
-      const pendingRegistration = await prisma.pendingBorrowLog.findMany({
+      // Check if the record to be added is on pending registration
+      const pendingRegistration = await prisma.pendingBorrowLog.findFirst({
          where: { idNumber: idNumber.trim() },
       });
-      if (pendingRegistration.length > 0)
+      if (pendingRegistration) {
          return await registerPendingBorrower(
-            idNumber,
+            pendingRegistration.idNumber,
             name,
             yearLevel,
             program,
             college,
          );
+      }
+
       const newRecord = await prisma.borrower.create({
          data: {
             idNumber: idNumber.trim(),
