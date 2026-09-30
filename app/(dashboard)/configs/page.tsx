@@ -1,4 +1,3 @@
-import { GOOGLE_SHEETS_API_CREDENTIALS } from "@/lib/googlesheetsapi";
 import { AddSheetId } from "./_components/AddSheetId";
 import Link from "next/link";
 import Image from "next/image";
@@ -16,10 +15,7 @@ async function Suspended() {
 
    return (
       <div className="p-7">
-         <AddSheetId
-            currentId={currentSpreadsheetId}
-            serviceAccountEmail={GOOGLE_SHEETS_API_CREDENTIALS.client_email}
-         />
+         <AddSheetId currentId={currentSpreadsheetId} />
          {currentSpreadsheetId && (
             <Link
                href={`https://docs.google.com/spreadsheets/d/${currentSpreadsheetId}/edit`}

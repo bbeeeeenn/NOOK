@@ -165,7 +165,9 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
                <Menu size={30} />
             </button>
             <p className="font-inter text-white-primary ml-3 text-xl font-medium">
-               {links.find((e) => pathname.includes(e.route))?.label ?? ""}
+               {[...links, { route: settingsPage, label: "Settings" }].find(
+                  (e) => pathname.includes(e.route),
+               )?.label ?? ""}
             </p>
          </header>
 

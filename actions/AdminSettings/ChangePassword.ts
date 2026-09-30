@@ -1,16 +1,18 @@
 "use server";
 
+import { settingsPage } from "@/constants";
 import { Prisma } from "@/generated/prisma/client";
 import { auth } from "@/lib/auth";
 import { compareData, hashData } from "@/lib/bcrypt";
 import { prisma } from "@/lib/prisma";
 import { Result } from "@/lib/types";
+import { revalidatePath } from "next/cache";
 
 export default async function changePasswordAction(
-   oldPassword: string,
    newPassword: string,
+   oldPassword?: string,
 ): Promise<Result<{ message: string }>> {
-   if (newPassword.length < 8 || oldPassword.length < 8)
+   if (newPassword.length < 8 || (oldPassword && oldPassword.length < 8))
       return {
          ok: false,
          error: "VALIDATION",
@@ -22,30 +24,33 @@ export default async function changePasswordAction(
       if (!session?.user?.id)
          return { ok: false, error: "AUTH", message: "Unauthorized" };
 
-      const data = await prisma.adminAccount.findUnique({
+      const data = await prisma.user.findUniqueOrThrow({
          where: { id: session.user.id },
          select: { password: true },
       });
 
-      if (!data?.password || !(await compareData(oldPassword, data?.password)))
-         return {
-            ok: false,
-            error: "AUTH",
-            message: "Incorrect current password.",
-         };
+      if (data.password) {
+         if (!oldPassword || !(await compareData(oldPassword, data?.password)))
+            return {
+               ok: false,
+               error: "AUTH",
+               message: "Incorrect current password.",
+            };
 
-      if (oldPassword === newPassword)
-         return {
-            ok: false,
-            error: "VALIDATION",
-            message:
-               "New password must be different from your current password",
-         };
+         if (oldPassword === newPassword)
+            return {
+               ok: false,
+               error: "VALIDATION",
+               message:
+                  "New password must be different from your current password",
+            };
+      }
 
-      await prisma.adminAccount.update({
+      await prisma.user.update({
          where: { id: session.user.id },
          data: { password: await hashData(newPassword) },
       });
+      revalidatePath(settingsPage);
 
       return { ok: true, data: { message: "Password changed successfully" } };
    } catch (e) {

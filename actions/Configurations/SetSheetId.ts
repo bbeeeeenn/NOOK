@@ -1,21 +1,21 @@
 "use server";
 import { configurationsPage } from "@/constants";
 import { auth } from "@/lib/auth";
-import { sheetsService } from "@/lib/googlesheetsapi";
+import { getSheetService } from "@/lib/googlesheetsapi";
 import { prisma } from "@/lib/prisma";
 import { Result } from "@/lib/types";
 import { GaxiosError } from "gaxios";
 import { revalidatePath } from "next/cache";
 
 export default async function setSheetIdAction(
-   id: string,
+   sheetId: string,
 ): Promise<Result<{ id: string }>> {
-   const newSpreadsheetId = id.trim();
+   const newSpreadsheetId = sheetId.trim();
    if (!newSpreadsheetId) {
       return {
          ok: false,
          error: "VALIDATION",
-         message: "Please provide an id",
+         message: "Please provide a spreadsheet ID",
       };
    }
 
@@ -28,6 +28,7 @@ export default async function setSheetIdAction(
       // Test the sheet
       const testRange = "A1";
 
+      const sheetsService = getSheetService(session);
       const existing = await sheetsService.spreadsheets.values.get({
          spreadsheetId: newSpreadsheetId,
          range: testRange,
@@ -70,7 +71,7 @@ export default async function setSheetIdAction(
                   ok: false,
                   error: "FORBIDDEN",
                   message:
-                     "Permission denied — share the sheet with the service account email and grant it Editor access",
+                     "Permission denied — share the sheet with the your email and grant it Editor access",
                };
             case 404:
                return {

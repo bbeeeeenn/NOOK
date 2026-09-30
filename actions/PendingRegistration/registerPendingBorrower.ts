@@ -3,7 +3,7 @@
 import { borrowerRecordsPage, pendingBorrowerRecordPage } from "@/constants";
 import { auth } from "@/lib/auth";
 import getSpreadsheetId from "@/lib/getSpreadsheetId";
-import { sheetsService } from "@/lib/googlesheetsapi";
+import { getSheetService } from "@/lib/googlesheetsapi";
 import { prisma } from "@/lib/prisma";
 import { Result } from "@/lib/types";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
@@ -64,6 +64,7 @@ export default async function registerPendingBorrower(
                where: { idNumber: pendingBorrowLogs[0].idNumber },
             });
 
+            const sheetsService = getSheetService(session);
             await sheetsService.spreadsheets.values.batchUpdate({
                spreadsheetId,
                requestBody: {

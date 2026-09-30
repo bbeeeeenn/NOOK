@@ -54,7 +54,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             geist.variable,
          )}
       >
-         <body className="flex min-h-full flex-col bg-[#f9fafb]">
+         <body className="flex min-h-full flex-col bg-[#f9fafb] select-none">
             <SpeedInsights />
             <ToastContainer
                position="bottom-right"
