@@ -31,10 +31,10 @@ export default function Login() {
          password,
          redirect: false,
       }))!;
-      if (!response.ok) {
+      if (response.error) {
          toast.error(
-            response.status === 401
-               ? "Invalid credentials"
+            response.code === "credentials"
+               ? "Incorrect email or password"
                : "Unexpecred error occured",
          );
       } else {
