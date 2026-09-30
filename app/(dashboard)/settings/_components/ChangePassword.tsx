@@ -26,7 +26,7 @@ const PasswordInput = ({
          <label
             htmlFor={name}
             className={clsx(
-               "font-inter mt-1.5 mb-1 block text-sm",
+               "font-inter mt-2 mb-1 block text-sm font-light",
                "text-white-primary",
             )}
          >

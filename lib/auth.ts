@@ -41,7 +41,11 @@ export const authOptions = {
             ) {
                return null;
             }
-            return { id: user.id, email: user.email, name: user.name };
+            return {
+               id: user.id,
+               email: user.email,
+               name: user.name,
+            };
          },
       }),
       // Google auth provider
@@ -57,8 +61,9 @@ export const authOptions = {
          },
       }),
    ],
+
    callbacks: {
-      // Signin
+      // #Signin ##################################################
       async signIn({ user, account }) {
          if (account?.provider === "google" && user.email) {
             const allowEmails = process.env
@@ -68,33 +73,13 @@ export const authOptions = {
          }
          return true;
       },
-      // JWT
-      async jwt({ user, account, token, session, trigger, profile }) {
+
+      // #JWT #######################################################
+      async jwt({ user, account, token, trigger, profile }) {
          token.error = undefined;
 
          if (user) {
-            token.id = user.id;
-         }
-
-         if (trigger === "update" && session) {
-            if (session.email) {
-               token.email = session.email;
-            }
-         }
-
-         if (
-            trigger === "signIn" &&
-            account?.provider === "google" &&
-            user?.email
-         ) {
-            const userFromDb = await prisma.user.findUnique({
-               where: { email: user.email },
-               select: { id: true, name: true },
-            });
-            if (userFromDb) {
-               token.id = userFromDb.id;
-               token.name = userFromDb.name;
-            }
+            token.id = user.id!;
          }
 
          // Store Google tokens on initial Google sign-in
@@ -102,6 +87,27 @@ export const authOptions = {
             token.accessToken = account.access_token;
             token.refreshToken = account.refresh_token;
             token.expiresAt = account.expires_at; // seconds since epoch
+
+            if (token.id) {
+               await prisma.account.updateMany({
+                  where: {
+                     userId: token.id,
+                     provider: "google",
+                     providerAccountId: account.providerAccountId,
+                  },
+                  data: {
+                     ...(account.access_token && {
+                        access_token: account.access_token,
+                     }),
+                     ...(account.refresh_token && {
+                        refresh_token: account.refresh_token,
+                     }),
+                     ...(account.expires_at != null && {
+                        expires_at: account.expires_at,
+                     }),
+                  },
+               });
+            }
 
             // Capture the current profile picture and sync it to the DB
             if (profile?.picture) {
@@ -224,7 +230,8 @@ export const authOptions = {
 
          return token;
       },
-      // Session
+
+      // #Session ################################################
       async session({ session, token }) {
          if (session.user) {
             session.user.id = token.id as string;
@@ -240,7 +247,7 @@ export const authOptions = {
    },
    // More configurations
    secret: process.env.AUTH_SECRET,
-   session: { strategy: "jwt" },
+   session: { strategy: "jwt", maxAge: 60 * 60 * 24 * 7 },
    pages: {
       signIn: adminLoginPage,
       error: adminLoginPage,

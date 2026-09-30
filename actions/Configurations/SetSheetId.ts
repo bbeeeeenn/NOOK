@@ -8,14 +8,14 @@ import { GaxiosError } from "gaxios";
 import { revalidatePath } from "next/cache";
 
 export default async function setSheetIdAction(
-   id: string,
+   sheetId: string,
 ): Promise<Result<{ id: string }>> {
-   const newSpreadsheetId = id.trim();
+   const newSpreadsheetId = sheetId.trim();
    if (!newSpreadsheetId) {
       return {
          ok: false,
          error: "VALIDATION",
-         message: "Please provide an id",
+         message: "Please provide a spreadsheet ID",
       };
    }
 
@@ -71,7 +71,7 @@ export default async function setSheetIdAction(
                   ok: false,
                   error: "FORBIDDEN",
                   message:
-                     "Permission denied — share the sheet with the service account email and grant it Editor access",
+                     "Permission denied — share the sheet with the your email and grant it Editor access",
                };
             case 404:
                return {

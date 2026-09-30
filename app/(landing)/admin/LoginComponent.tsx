@@ -2,13 +2,7 @@
 import { Nook1 } from "@/components/Images";
 import { logsPage } from "@/constants";
 import clsx from "clsx";
-import {
-   Eye,
-   EyeOff,
-   LoaderCircle,
-   Square,
-   SquareCheckBig,
-} from "lucide-react";
+import { Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -22,6 +16,7 @@ export default function Login() {
       email: "",
       password: "",
    });
+
    const [isPending, setIsPending] = useState(false);
 
    const handleCredentialsSubmit = async (e: SubmitEvent) => {
@@ -45,14 +40,13 @@ export default function Login() {
       } else {
          router.replace(logsPage);
       }
+
       setIsPending(false);
    };
    const handleGoogle = () => signIn("google", { callbackUrl: logsPage });
 
    const [showPassword, setShowPassword] = useState(false);
-   const [rememberMe, setRememberMe] = useState(false);
    const toggleShowPassword = () => setShowPassword((prev) => !prev);
-   const toggleRememberMe = () => setRememberMe((prev) => !prev);
    return (
       <form
          onSubmit={handleCredentialsSubmit}
@@ -109,27 +103,12 @@ export default function Login() {
                </button>
             </div>
          </div>
-         <div className="my-4 flex flex-wrap justify-between gap-2 text-xs font-light">
-            <div>
-               <button
-                  className="flex items-center gap-x-1.5"
-                  type="button"
-                  onClick={toggleRememberMe}
-               >
-                  <span>
-                     {rememberMe ? (
-                        <SquareCheckBig size={15} />
-                     ) : (
-                        <Square size={15} />
-                     )}
-                  </span>
-                  <span className="truncate">Remember me</span>
-               </button>
-            </div>
-            <Link href={""} className="truncate">
-               Forgot Password ?
-            </Link>
-         </div>
+         <Link
+            href={""}
+            className="my-4 block w-fit truncate text-xs font-light"
+         >
+            Forgot your password?
+         </Link>
          <button
             disabled={isPending}
             className="bg-green-primary from-white-primary/12 flex w-full items-center justify-center rounded-lg bg-linear-to-b to-transparent py-3 text-sm font-light outline-1 outline-[#375DFB]"

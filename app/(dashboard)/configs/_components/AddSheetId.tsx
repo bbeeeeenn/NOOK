@@ -2,7 +2,7 @@
 
 import setSheetIdAction from "@/actions/Configurations/SetSheetId";
 import clsx from "clsx";
-import { Copy, Link, LoaderCircle } from "lucide-react";
+import { Link, LoaderCircle } from "lucide-react";
 import Image from "next/image";
 import { useActionState, useState } from "react";
 import { toast } from "react-toastify";
