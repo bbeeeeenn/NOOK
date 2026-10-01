@@ -11,7 +11,7 @@ export default function PrivacyPolicy() {
                <Nook1 className="mx-auto" />
             </Link>
          </nav>
-         <main className="font-inter mx-auto max-w-200 py-10 text-sm sm:text-base">
+         <main className="font-inter mx-auto max-w-200 py-10 text-sm select-text sm:text-base">
             <h1 className="text-center text-2xl font-bold sm:text-3xl">
                Privacy Policy
             </h1>
