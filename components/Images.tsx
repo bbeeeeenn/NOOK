@@ -23,8 +23,8 @@ export function Nook2(props: Partial<ImageProps>) {
          src="/icon2.svg"
          alt=""
          draggable={false}
-         width={1}
-         height={1}
+         width={196}
+         height={87}
          loading="eager"
          {...props}
       />

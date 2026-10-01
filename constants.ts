@@ -1,4 +1,5 @@
 export const homePage = "/";
+export const privacyPolicyPage = "/privacy-policy";
 export const adminLoginPage = "/admin";
 export const logsPage = "/logs";
 export const topBorrowersPage = "/logs/top-borrowers";
