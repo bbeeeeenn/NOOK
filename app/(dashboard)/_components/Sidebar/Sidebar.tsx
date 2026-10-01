@@ -119,7 +119,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
                      )}
                   </span>
                   <span className="truncate">
-                     {session.data?.user.name ?? "Account"}
+                     {session.data?.user.name ?? "Settings"}
                   </span>
                   {!pathname.includes(settingsPage) && (
                      <span className="ml-auto">
