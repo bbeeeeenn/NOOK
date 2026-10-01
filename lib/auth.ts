@@ -8,6 +8,13 @@ import { compareData } from "./bcrypt";
 import NextAuth, { NextAuthConfig } from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 
+const authScopes = {
+   openid: "openid",
+   email: "email",
+   profile: "profile",
+   sheets: "https://www.googleapis.com/auth/spreadsheets",
+};
+
 export const authOptions = {
    adapter: PrismaAdapter(prisma),
    providers: [
@@ -54,11 +61,12 @@ export const authOptions = {
          clientSecret: process.env.AUTH_GOOGLE_SECRET!,
          authorization: {
             params: {
-               scope: "openid email profile https://www.googleapis.com/auth/spreadsheets",
+               scope: Object.values(authScopes).join(" "),
                access_type: "offline",
                prompt: "consent",
             },
          },
+         allowDangerousEmailAccountLinking: true,
       }),
    ],
 
@@ -66,6 +74,13 @@ export const authOptions = {
       // #Signin ##################################################
       async signIn({ user, account }) {
          if (account?.provider === "google" && user.email) {
+            if (!account.scope?.split(" ").includes(authScopes.sheets)) {
+               // Prevent missing Google Sheet access scope
+               // This is an ugly workaround since user won't know the reason why the login attempt has failed
+               // A clean approach should be putting a hint in the JWT token saying that the access token has some missing scope. Then giving them a chance to re-grant the required missing scope.
+               // But I won't bother for now.
+               return false;
+            }
             const allowEmails = process.env
                .ALLOWED_EMAILS!.toLowerCase()
                .split(";");

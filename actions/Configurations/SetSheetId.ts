@@ -71,7 +71,7 @@ export default async function setSheetIdAction(
                   ok: false,
                   error: "FORBIDDEN",
                   message:
-                     "Permission denied — share the sheet with the your email and grant it Editor access",
+                     "Permission denied — share the sheet with the your email and grant it Editor access", // This could also happen if the user unchecked the permission to access Google Sheets on consent screen when logging in
                };
             case 404:
                return {
