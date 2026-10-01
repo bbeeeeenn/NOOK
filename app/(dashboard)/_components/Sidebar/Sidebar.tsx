@@ -105,19 +105,20 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
                   )}
                   onClick={() => toggleMobileSidebar(false)}
                >
-                  <span>
-                     {session.data?.user.image ? (
-                        <Image
-                           src={session.data.user.image}
-                           width={100}
-                           height={100}
-                           alt=""
-                           className="aspect-square w-7 rounded-md outline-1"
-                        />
-                     ) : (
+                  {session.data?.user.image ? (
+                     <Image
+                        src={session.data.user.image}
+                        width={100}
+                        height={100}
+                        alt=""
+                        className="size-7 rounded-md outline-1"
+                     />
+                  ) : (
+                     <span>
                         <Settings />
-                     )}
-                  </span>
+                     </span>
+                  )}
+
                   <span className="truncate">
                      {session.data?.user.name ?? "Settings"}
                   </span>
