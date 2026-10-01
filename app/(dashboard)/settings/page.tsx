@@ -47,7 +47,7 @@ async function Suspended() {
 
 function PasswordsSkeleton() {
    return (
-      <div className="mt-10">
+      <div className="mt-10 animate-pulse">
          {Array.from({ length: 3 }, (_, index) => (
             <div key={index}>
                <div className="mt-2 mb-1 h-5 w-32 rounded bg-white/30" />
