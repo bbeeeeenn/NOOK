@@ -5,6 +5,12 @@ import { redirect } from "next/navigation";
 import { adminLoginPage } from "@/constants";
 import Image from "next/image";
 import { prisma } from "@/lib/prisma";
+import LogoutButton from "./_components/LogoutButton";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+   title: "Nook - Account",
+};
 
 export const instant = false;
 export default async function SettingsPage() {
@@ -17,8 +23,8 @@ export default async function SettingsPage() {
    if (!user) redirect(adminLoginPage);
 
    return (
-      <div className="min-h-[calc(100dvh-85px)] min-w-50 bg-[#34A853] p-7 select-none">
-         <div className="mx-auto max-w-150 pb-10">
+      <div className="min-h-[calc(100dvh-85px)] min-w-75 bg-[#34A853] p-7 select-none">
+         <div className="mx-auto max-w-150 pb-4">
             <p className="font-inter mb-4 flex items-center gap-2 text-2xl font-semibold text-white">
                <span>
                   <UserShield />
@@ -31,7 +37,7 @@ export default async function SettingsPage() {
                   alt=""
                   width={50}
                   height={50}
-                  className="rounded-md"
+                  className="aspect-square h-12.5 rounded-md"
                />
                <div>
                   <p className="truncate text-lg font-medium">
@@ -47,6 +53,7 @@ export default async function SettingsPage() {
             </div>
 
             <ChangePassword noPassword={!user.password} />
+            <LogoutButton />
          </div>
       </div>
    );

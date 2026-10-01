@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
-export default function Nav() {
+export default function Topbar() {
    const [isOpen, setIsOpen] = useState(false);
    return (
       <nav>

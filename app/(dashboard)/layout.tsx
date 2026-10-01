@@ -1,5 +1,5 @@
-import { SidebarContextProvider } from "./_Sidebar/SidebarContextProvider";
-import Sidebar from "./_Sidebar/Sidebar";
+import { SidebarContextProvider } from "./_components/Sidebar/SidebarContextProvider";
+import Sidebar from "./_components/Sidebar/Sidebar";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { adminLoginPage } from "@/constants";

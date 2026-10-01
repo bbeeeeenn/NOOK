@@ -2,7 +2,7 @@
 
 import { Download, LoaderCircle, Plus, X } from "lucide-react";
 import React, { useActionState, useRef, useState } from "react";
-import { useSidebar } from "../../_Sidebar/SidebarContextProvider";
+import { useSidebar } from "../../_components/Sidebar/SidebarContextProvider";
 import clsx from "clsx";
 import ProgramDropdown from "./ProgramDropdown";
 import CollegeDropdown, { CollegeInfo } from "./CollegeDropdown";

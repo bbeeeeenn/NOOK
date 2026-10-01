@@ -6,7 +6,7 @@ import ProgramDropdown from "../_components/ProgramDropdown";
 import CollegeDropdown, { CollegeInfo } from "../_components/CollegeDropdown";
 import { ChangeEvent, useActionState, useRef, useState } from "react";
 import clsx from "clsx";
-import { useSidebar } from "../../_Sidebar/SidebarContextProvider";
+import { useSidebar } from "../../_components/Sidebar/SidebarContextProvider";
 import { LoaderCircle, X } from "lucide-react";
 import { toast } from "react-toastify";
 import { programs } from "@/constants";

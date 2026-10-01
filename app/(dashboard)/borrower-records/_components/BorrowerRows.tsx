@@ -3,7 +3,7 @@
 import clsx from "clsx";
 import { Check, Edit, LoaderCircle, Trash2, X } from "lucide-react";
 import { ChangeEvent, useActionState, useRef, useState } from "react";
-import { useSidebar } from "../../_Sidebar/SidebarContextProvider";
+import { useSidebar } from "../../_components/Sidebar/SidebarContextProvider";
 import ProgramDropdown from "./ProgramDropdown";
 import CollegeDropdown, { CollegeInfo } from "./CollegeDropdown";
 import { useChangeDialogRef, useDialogRef } from "./DialogProvider";

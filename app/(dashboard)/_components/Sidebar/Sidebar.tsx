@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import React, { useState } from "react";
+import React from "react";
 import {
    useDesktopSidebarToggle,
    useMobileSidebarToggle,
@@ -9,8 +9,6 @@ import {
 } from "./SidebarContextProvider";
 import {
    ChevronRight,
-   LoaderCircle,
-   LogOut,
    LucideIcon,
    Menu,
    NotepadText,
@@ -23,7 +21,6 @@ import {
 } from "lucide-react";
 import { Nook1 } from "@/components/Images";
 import {
-   adminLoginPage,
    configurationsPage,
    logsPage,
    scannerPage,
@@ -33,7 +30,8 @@ import {
 } from "@/constants";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import Image from "next/image";
 
 const links: { label: string; route: string; icon: LucideIcon }[] = [
    { label: "Borrow Logs", route: logsPage, icon: NotepadText },
@@ -43,34 +41,8 @@ const links: { label: string; route: string; icon: LucideIcon }[] = [
    { label: "Configurations", route: configurationsPage, icon: Wrench },
 ];
 
-function LogoutButton() {
-   const [isLoading, setIsLoading] = useState(false);
-   const handleLogout = async () => {
-      if (isLoading) return;
-      setIsLoading(true);
-      await signOut({ redirect: false });
-      setIsLoading(false);
-      window.location.href = adminLoginPage;
-   };
-   return (
-      <button
-         className="flex w-full items-center gap-2 rounded-md p-3 outline-0 hover:bg-white/8 focus-visible:bg-white/8"
-         onClick={handleLogout}
-      >
-         <span>
-            <LogOut />
-         </span>
-         <span className="truncate">Log out</span>
-         {isLoading && (
-            <span className="ml-auto">
-               <LoaderCircle className="animate-spin" />
-            </span>
-         )}
-      </button>
-   );
-}
-
 export default function Sidebar({ children }: { children: React.ReactNode }) {
+   const session = useSession();
    const sidebarSwitch = useSidebar();
    const toggleDesktopSidebar = useDesktopSidebarToggle();
    const toggleMobileSidebar = useMobileSidebarToggle();
@@ -78,10 +50,12 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
 
    return (
       <>
-         <nav
+         <aside
             className={clsx(
-               "fixed z-100 flex h-dvh w-full flex-col overflow-auto bg-[#34A853] px-7 py-5 transition-transform select-none sm:w-80",
-               sidebarSwitch.mobile ? "translate-x-0" : "-translate-x-full",
+               "fixed z-100 flex h-dvh w-full flex-col overflow-auto bg-[#34A853] px-7 py-5 transition-[transform_shadow] select-none sm:w-80 sm:px-4 md:shadow-none",
+               sidebarSwitch.mobile
+                  ? "translate-x-0 sm:shadow-[0_0_0_3000px_rgba(0,0,0,0.1)]"
+                  : "-translate-x-full",
                sidebarSwitch.desktop
                   ? "md:translate-x-0"
                   : "md:-translate-x-full",
@@ -132,18 +106,29 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
                   onClick={() => toggleMobileSidebar(false)}
                >
                   <span>
-                     <Settings />
+                     {session.data?.user.image ? (
+                        <Image
+                           src={session.data.user.image}
+                           width={100}
+                           height={100}
+                           alt=""
+                           className="aspect-square w-7 rounded-md outline-1"
+                        />
+                     ) : (
+                        <Settings />
+                     )}
                   </span>
-                  <span className="truncate">Settings</span>
+                  <span className="truncate">
+                     {session.data?.user.name ?? "Account"}
+                  </span>
                   {!pathname.includes(settingsPage) && (
                      <span className="ml-auto">
                         <ChevronRight />
                      </span>
                   )}
                </Link>
-               <LogoutButton />
             </div>
-         </nav>
+         </aside>
 
          {/* Header */}
          <header
@@ -187,7 +172,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
                "bg-green-primary fixed inset-x-0 bottom-0 h-6.25 transition-[left]",
                sidebarSwitch.desktop && "md:left-81",
             )}
-         ></footer>
+         />
       </>
    );
 }

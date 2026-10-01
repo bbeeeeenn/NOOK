@@ -1,4 +1,4 @@
-import Nav from "../_components/Nav";
+import Topbar from "../_components/Topbar";
 
 export default function Layout({
    children,
@@ -6,7 +6,7 @@ export default function Layout({
    return (
       <>
          {children}
-         <Nav />
+         <Topbar />
       </>
    );
 }
