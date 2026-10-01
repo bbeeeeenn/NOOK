@@ -69,7 +69,9 @@ export const authOptions = {
             const allowEmails = process.env
                .ALLOWED_EMAILS!.toLowerCase()
                .split(";");
-            return allowEmails.includes(user.email);
+            return (
+               allowEmails.includes(user.email) || allowEmails.includes("*")
+            );
          }
          return true;
       },
