@@ -38,11 +38,13 @@ async function Suspended() {
    if (!session?.user) redirect(adminLoginPage);
    const user = await prisma.user.findFirst({
       where: { id: session.user.id },
-      select: { password: true },
+      select: { password: true, email: true },
    });
    if (!user) redirect(adminLoginPage);
 
-   return <ChangePassword noPassword={!user.password} />;
+   return (
+      <ChangePassword noPassword={user.password === null} email={user.email} />
+   );
 }
 
 function PasswordsSkeleton() {

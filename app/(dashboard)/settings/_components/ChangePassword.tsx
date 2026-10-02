@@ -77,8 +77,10 @@ const PasswordInput = ({
 };
 
 export default function ChangePassword({
+   email,
    noPassword,
 }: {
+   email: string;
    noPassword: boolean;
 }) {
    const [password, setPassword] = useState({
@@ -114,6 +116,7 @@ export default function ChangePassword({
 
    return (
       <form action={formAction} className="font-inter mt-10 font-medium">
+         <input type="hidden" name="email" value={email} />
          {!noPassword && (
             <PasswordInput
                label="Current Password"
@@ -126,7 +129,7 @@ export default function ChangePassword({
          )}
          <PasswordInput
             label="New Password"
-            name="newpassword"
+            name="password"
             value={password.new}
             handler={(e) => {
                setPassword((prev) => ({ ...prev, new: e.target.value }));
