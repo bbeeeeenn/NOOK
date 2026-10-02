@@ -2,7 +2,7 @@
 
 import changePasswordAction from "@/actions/AdminSettings/ChangePassword";
 import clsx from "clsx";
-import { Eye, EyeClosed, SquarePen } from "lucide-react";
+import { Eye, EyeClosed, LoaderCircle, SquarePen } from "lucide-react";
 import Image from "next/image";
 import { ChangeEvent, useActionState, useState } from "react";
 import { toast } from "react-toastify";
@@ -92,7 +92,7 @@ export default function ChangePassword({
       !password.new || !password.confirm || password.new === password.confirm;
 
    const onAction = async (): Promise<void> => {
-      if (password.new !== password.confirm || isPending) {
+      if (password.new !== password.confirm) {
          toast.error("Passwords don't match");
          return;
       }
@@ -115,8 +115,21 @@ export default function ChangePassword({
    const [, formAction, isPending] = useActionState(onAction, null);
 
    return (
-      <form action={formAction} className="font-inter mt-10 font-medium">
-         <input type="hidden" name="username" value={email} />
+      <form
+         action={formAction}
+         onSubmit={(e) => {
+            if (isPending) e.preventDefault();
+         }}
+         className="font-inter mt-10 font-medium"
+      >
+         <input
+            type="email"
+            name="email"
+            defaultValue={email}
+            readOnly
+            tabIndex={-1}
+            className="pointer-events-none absolute size-0 opacity-0"
+         />
          {!noPassword && (
             <PasswordInput
                label="Current Password"
@@ -146,11 +159,18 @@ export default function ChangePassword({
             error={!match}
          />
          {(password.confirm || password.current || password.new) && (
-            <button className="bg-yellow-primary font-roboto mt-4 flex w-full items-center justify-center gap-2 rounded-lg p-2 font-medium shadow-md hover:brightness-105 active:brightness-95">
+            <button
+               className="bg-yellow-primary font-roboto mt-4 flex w-full items-center justify-center gap-2 rounded-lg p-2 font-medium shadow-md hover:brightness-105 active:brightness-95 disabled:pointer-events-none disabled:opacity-80"
+               disabled={isPending}
+            >
                <span>
-                  <SquarePen size={17} />
+                  {isPending ? (
+                     <LoaderCircle size={17} className="animate-spin" />
+                  ) : (
+                     <SquarePen size={17} />
+                  )}
                </span>
-               Change Password
+               {isPending ? "Processing..." : "Change Password"}
             </button>
          )}
       </form>
