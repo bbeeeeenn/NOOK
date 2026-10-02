@@ -4,7 +4,12 @@ import changePasswordAction from "@/actions/AdminSettings/ChangePassword";
 import clsx from "clsx";
 import { Eye, EyeClosed, LoaderCircle, SquarePen } from "lucide-react";
 import Image from "next/image";
-import { ChangeEvent, useActionState, useState } from "react";
+import {
+   ChangeEvent,
+   HTMLInputAutoCompleteAttribute,
+   useActionState,
+   useState,
+} from "react";
 import { toast } from "react-toastify";
 
 const PasswordInput = ({
@@ -13,12 +18,14 @@ const PasswordInput = ({
    value,
    handler,
    error,
+   autoComplete,
 }: {
    label: string;
    name: string;
    value: string;
    handler: (e: ChangeEvent<HTMLInputElement>) => void;
    error?: boolean;
+   autoComplete: HTMLInputAutoCompleteAttribute;
 }) => {
    const [showPassword, setShowPassword] = useState(false);
    return (
@@ -53,7 +60,7 @@ const PasswordInput = ({
                />
             </span>
             <input
-               autoComplete="off"
+               autoComplete={autoComplete}
                spellCheck={false}
                id={name}
                type={showPassword ? "text" : "password"}
@@ -128,6 +135,8 @@ export default function ChangePassword({
             defaultValue={email}
             readOnly
             tabIndex={-1}
+            autoComplete="username"
+            aria-hidden={true}
             className="pointer-events-none absolute size-0 opacity-0"
          />
          {!noPassword && (
@@ -135,6 +144,7 @@ export default function ChangePassword({
                label="Current Password"
                name="currentpassword"
                value={password.current}
+               autoComplete="current-password"
                handler={(e) => {
                   setPassword((prev) => ({ ...prev, current: e.target.value }));
                }}
@@ -144,6 +154,7 @@ export default function ChangePassword({
             label="New Password"
             name="password"
             value={password.new}
+            autoComplete="new-password"
             handler={(e) => {
                setPassword((prev) => ({ ...prev, new: e.target.value }));
             }}
@@ -153,6 +164,7 @@ export default function ChangePassword({
             label="Confirm Password"
             name="confirmpassword"
             value={password.confirm}
+            autoComplete="off"
             handler={(e) => {
                setPassword((prev) => ({ ...prev, confirm: e.target.value }));
             }}
