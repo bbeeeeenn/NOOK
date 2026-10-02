@@ -116,7 +116,7 @@ export default function ChangePassword({
 
    return (
       <form action={formAction} className="font-inter mt-10 font-medium">
-         <input type="hidden" name="email" value={email} />
+         <input type="hidden" name="username" value={email} />
          {!noPassword && (
             <PasswordInput
                label="Current Password"
