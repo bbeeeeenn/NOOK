@@ -1,7 +1,7 @@
 "use server";
 
 import { borrowerRecordsPage, importBorrowerRecordsPage } from "@/constants";
-import { auth } from "@/lib/auth";
+import { auth, unstable_update } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Result } from "@/lib/types";
 import {
@@ -141,35 +141,39 @@ export default async function importRecords(
       }
       if (err instanceof GaxiosError) {
          const status = err.response?.status;
-         if (status === 400) {
+         if (status === 400)
             return {
                ok: false,
                error: "VALIDATION",
                message:
                   "Couldn't sync records. Check that the sheet name and range are correct and valid.",
             };
+         if (status === 401) {
+            await unstable_update({ accessToken: undefined });
+            return {
+               ok: false,
+               error: "AUTH",
+               message: "Please connect your Google account to continue.",
+            };
          }
-         if (status === 404) {
+         if (status === 404)
             return {
                ok: false,
                error: "NOT_FOUND",
                message: "Spreadsheet or range doesn't exist",
             };
-         }
-         if (status === 403) {
+         if (status === 403)
             return {
                ok: false,
                error: "FORBIDDEN",
                message: "You doesn't have access to this sheet",
             };
-         }
-         if (status === 429) {
+         if (status === 429)
             return {
                ok: false,
                error: "RATE_LIMITED",
                message: "Too many requests",
             };
-         }
 
          console.error("Sheets API error:", status, err.response?.data);
          return { ok: false, error: "OTHER", message: err.message };

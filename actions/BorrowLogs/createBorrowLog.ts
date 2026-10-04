@@ -6,7 +6,7 @@ import {
    topBorrowersPage,
 } from "@/constants";
 import { updatePendingBorrowerRecordsCache } from "@/data-access-layer/PendingBorrowerRecords";
-import { auth } from "@/lib/auth";
+import { auth, unstable_update } from "@/lib/auth";
 import { fetchBook, normalizeIsbn } from "@/lib/fetchBook";
 import getSpreadsheetId from "@/lib/getSpreadsheetId";
 import { prisma } from "@/lib/prisma";
@@ -113,12 +113,14 @@ export default async function createBorrowLog(
       console.error(e);
       if (e instanceof GaxiosError) {
          const status = e.response?.status;
-         if (status === 401)
+         if (status === 401) {
+            await unstable_update({ accessToken: undefined });
             return {
                ok: false,
                error: "AUTH",
                message: "Please connect your Google account to continue.",
             };
+         }
          if (status === 400)
             return {
                ok: false,

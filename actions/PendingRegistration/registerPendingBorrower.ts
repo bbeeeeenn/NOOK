@@ -1,7 +1,7 @@
 "use server";
 
 import { borrowerRecordsPage, pendingBorrowerRecordPage } from "@/constants";
-import { auth } from "@/lib/auth";
+import { auth, unstable_update } from "@/lib/auth";
 import getSpreadsheetId from "@/lib/getSpreadsheetId";
 import { getSheetService } from "@/lib/googlesheetsapi";
 import { prisma } from "@/lib/prisma";
@@ -108,6 +108,13 @@ export default async function registerPendingBorrower(
                   error: "VALIDATION",
                   message:
                      "We couldn't complete the registration. Please check the borrower details and try again.",
+               };
+            case 401:
+               await unstable_update({ accessToken: undefined });
+               return {
+                  ok: false,
+                  error: "AUTH",
+                  message: "Please connect your Google account to continue.",
                };
             case 403:
                return {
