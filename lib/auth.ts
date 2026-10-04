@@ -92,8 +92,20 @@ export const authOptions = {
       },
 
       // #JWT #######################################################
-      async jwt({ user, account, token, trigger, profile }) {
+      async jwt({ user, account, token, trigger, session, profile }) {
          token.error = undefined;
+
+         if (trigger === "update" && session.accessToken === undefined) {
+            token.accessToken = undefined;
+            token.refreshToken = undefined;
+            token.expiresAt = undefined;
+            token.error = undefined;
+
+            await prisma.account.updateMany({
+               where: { userId: token.id },
+               data: { access_token: null, refresh_token: null, expires_at: null },
+            });
+         }
 
          if (user) {
             token.id = user.id!;
@@ -176,7 +188,7 @@ export const authOptions = {
          // Refresh if expired
          if (
             token.expiresAt &&
-            Date.now() >= (token.expiresAt as number) * 1000 &&
+            Date.now() >= token.expiresAt * 1000 &&
             token.refreshToken
          ) {
             try {
@@ -272,4 +284,5 @@ export const authOptions = {
    },
 } satisfies NextAuthConfig;
 
-export const { auth, signIn, signOut, handlers } = NextAuth(authOptions);
+export const { auth, signIn, signOut, handlers, unstable_update } =
+   NextAuth(authOptions);

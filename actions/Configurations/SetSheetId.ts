@@ -1,6 +1,6 @@
 "use server";
 import { configurationsPage } from "@/constants";
-import { auth } from "@/lib/auth";
+import { auth, unstable_update } from "@/lib/auth";
 import { getSheetService } from "@/lib/googlesheetsapi";
 import { prisma } from "@/lib/prisma";
 import { Result } from "@/lib/types";
@@ -66,6 +66,13 @@ export default async function setSheetIdAction(
          const message = err.response?.data?.error?.message ?? err.message;
 
          switch (status) {
+            case 401:
+               await unstable_update({ accessToken: undefined });
+               return {
+                  ok: false,
+                  error: "AUTH",
+                  message: "Please connect your Google account to continue.",
+               };
             case 403:
                return {
                   ok: false,

@@ -113,6 +113,12 @@ export default async function createBorrowLog(
       console.error(e);
       if (e instanceof GaxiosError) {
          const status = e.response?.status;
+         if (status === 401)
+            return {
+               ok: false,
+               error: "AUTH",
+               message: "Please connect your Google account to continue.",
+            };
          if (status === 400)
             return {
                ok: false,
