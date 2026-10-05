@@ -36,7 +36,7 @@ const plexSans = IBM_Plex_Sans({
 export const metadata: Metadata = {
    title: "Nook",
    description: "",
-   verification: { google: "3YB1Upi4xtlWnOM7gn8VBJG_nCaJBDXY-XGhN312dsk" },
+   verification: { google: "uig61X3q-a-UlvaJ1wLScJlCySgkRo8aNRMY8acL3wM" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
