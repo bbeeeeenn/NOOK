@@ -14,7 +14,7 @@ import { toast } from "react-toastify";
 import deleteBorrowerRecord from "@/actions/BorrowerRecords/deleteRecord";
 import TableRow from "@/components/table/tableRow";
 import { programs } from "@/constants";
-import { BorrowerModel } from "@/generated/prisma/models";
+import { BorrowerRecordModel } from "@/generated/prisma/models";
 
 type EditInfo = {
    id: string;
@@ -31,7 +31,7 @@ function BorrowerRow({
    onEdit,
 }: {
    index: number;
-   borrowerRecord: BorrowerModel;
+   borrowerRecord: BorrowerRecordModel;
    onEdit: () => void;
 }) {
    const [confirmingDelete, setConfirmingDelete] = useState(false);
@@ -44,7 +44,7 @@ function BorrowerRow({
          const loadingToast = toast.loading(
             `Deleting ${borrowerRecord.idNumber}`,
          );
-         const res = await deleteBorrowerRecord(borrowerRecord.id);
+         const res = await deleteBorrowerRecord(borrowerRecord.idNumber);
          if (res.ok) {
             toast.update(loadingToast, {
                isLoading: false,
@@ -74,7 +74,7 @@ function BorrowerRow({
          data={[
             index,
             borrowerRecord.idNumber,
-            borrowerRecord.name,
+            borrowerRecord.firstname,
             borrowerRecord.program,
             borrowerRecord.yearLevel,
             borrowerRecord.college,
@@ -103,7 +103,7 @@ export default function BorrowerRecords({
    records,
    startIndex = 0,
 }: {
-   records: BorrowerModel[];
+   records: BorrowerRecordModel[];
    startIndex?: number;
 }) {
    const editRecordDialogRef = useRef<HTMLDialogElement>(null);
@@ -180,15 +180,15 @@ export default function BorrowerRecords({
       <>
          {records.map((record, i) => (
             <BorrowerRow
-               key={record.id}
+               key={record.idNumber}
                index={startIndex + i + 1}
                borrowerRecord={record}
                onEdit={() =>
                   editNewRow({
-                     id: record.id,
+                     id: record.idNumber,
                      college: record.college,
                      idNumber: record.idNumber,
-                     name: record.name,
+                     name: record.firstname,
                      program: record.program,
                      yearLevel: record.yearLevel,
                   })
