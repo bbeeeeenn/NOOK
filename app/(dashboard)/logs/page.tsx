@@ -52,7 +52,7 @@ async function Suspended({ searchParams }: { searchParams: SearchParameters }) {
          data={[
             toPHDateString(row.date),
             row.idNumber,
-            row.borrower?.name,
+            row.borrower?.firstname,
             row.borrower?.program,
             row.borrower?.yearLevel,
             row.borrower?.college,

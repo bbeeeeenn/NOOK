@@ -20,9 +20,9 @@ import { Result } from "@/lib/types";
 // import { getSheetService } from "@/lib/googlesheetsapi";
 
 export default async function createBorrowLog(
-   // idNumber: string,
-   // bookCode: string,
-   // isbn: string,
+   idNumber: string,
+   bookCode: string,
+   isbn: string,
 ): Promise<Result<{ message: string }>> {
    return {
       ok: false,

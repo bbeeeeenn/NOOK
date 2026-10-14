@@ -21,8 +21,8 @@ import { Result } from "@/lib/types";
 // const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 export default async function importRecords(
-   // sheetName: string,
-   // range: string,
+   sheetName: string,
+   range: string,
 ): Promise<Result<{ message: string }>> {
    return {
       ok: false,

@@ -34,8 +34,8 @@ export default async function getCollegeBorrowerCounts(
 
       for (const row of borrowedBy) {
          counts.set(
-            row.borrower.college,
-            (counts.get(row.borrower.college) ?? 0) + 1,
+            row.borrower?.college ?? "VISITOR",
+            (counts.get(row.borrower?.college ?? "VISITOR") ?? 0) + 1,
          );
       }
 

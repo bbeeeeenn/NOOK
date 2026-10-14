@@ -40,11 +40,11 @@ export async function GET(
             message: "Record not found",
          });
 
-      const { name, yearLevel, program, college } = borrower;
+      const { firstname, yearLevel, program, college } = borrower;
 
       return NextResponse.json({
          ok: true,
-         data: { name, yearLevel, program, college },
+         data: { name: firstname, yearLevel, program, college },
       });
    } catch (e) {
       console.error(e);
@@ -61,7 +61,7 @@ async function getBorrower(idNumberQuery: string) {
    cacheLife("days");
    cacheTag(`borrower:${idNumberQuery}`);
 
-   const borrower = await prisma.borrower.findUnique({
+   const borrower = await prisma.borrowerRecord.findUnique({
       where: { idNumber: idNumberQuery },
    });
 
