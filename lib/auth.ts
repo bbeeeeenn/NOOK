@@ -111,7 +111,7 @@ export const authOptions = {
    session: { strategy: "jwt", maxAge: 60 * 60 * 24 * 7 },
    pages: {
       signIn: adminLoginPage,
-      // error: adminLoginPage,
+      error: adminLoginPage,
       signOut: adminLoginPage,
    },
 } satisfies NextAuthConfig;
