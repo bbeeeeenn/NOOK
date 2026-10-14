@@ -5,10 +5,8 @@ export const logsPage = "/logs";
 export const topBorrowersPage = "/logs/top-borrowers";
 export const borrowerRecordsPage = "/borrower-records";
 export const importBorrowerRecordsPage = "/borrower-records/import";
-export const pendingBorrowerRecordPage = "/borrower-records/pending";
 export const scannerPage = "/scanner";
 export const reportsPage = "/reports";
-export const configurationsPage = "/configs";
 export const settingsPage = "/settings";
 
 export const sheetIdRoute = "/api/sheetid";

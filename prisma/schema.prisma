@@ -7,56 +7,49 @@ datasource db {
   provider = "postgresql"
 }
 
-model Configuration {
-  id            String @id @default(cuid())
-  spreadsheetId String
-
-  adminAccountId String @unique
-  user           User   @relation(fields: [adminAccountId], references: [id])
+enum PatronType {
+  Visitor
+  Student
+  Faculty
+  Graduate
 }
 
 model BorrowLog {
   id String @id @default(cuid())
 
-  date        DateTime @default(now())
-  idNumber    String
+  type        PatronType
+  date        DateTime   @default(now())
+  scannedId   String?
+  idNumber    String?
   bookBarcode String
   bookTitle   String?
   bookAuthor  String?
 
-  borrower Borrower @relation(fields: [idNumber], references: [idNumber])
+  borrower BorrowerRecord? @relation(fields: [idNumber], references: [idNumber])
 
   @@index([date])
+  @@index([type])
   @@index([idNumber, date])
 }
 
-model PendingBorrowLog {
-  id String @id @default(cuid())
-
-  date        DateTime @default(now())
-  idNumber    String
-  bookBarcode String
-  bookTitle   String?
-  bookAuthor  String?
-  tableRange  String?
-
-  @@index([date])
-  @@index([idNumber, date])
-}
-
-model Borrower {
-  id String @id @default(cuid())
-
-  idNumber  String   @unique
-  name      String
-  yearLevel Int
-  program   String
-  college   String
-  createdAt DateTime @default(now())
+model BorrowerRecord {
+  idNumber   String   @id
+  firstname  String
+  lastname   String
+  middlename String?
+  yearLevel  Int
+  program    String
+  college    String
+  createdAt  DateTime @default(now())
 
   borrowLogs BorrowLog[]
 
   @@index([createdAt])
+}
+
+enum UserType {
+  Admin
+  Staff
 }
 
 model User {
@@ -66,15 +59,16 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String?
+  userType      UserType  @default(Staff)
 
   accounts      Account[]
   sessions      Session[]
-  configuration Configuration?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
+// Below are for authentication purposes
 model Account {
   userId            String
   type              String

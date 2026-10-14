@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "./lib/auth";
 import {
    adminLoginPage,
-   configurationsPage,
    logsPage,
    scannerPage,
    settingsPage,
@@ -13,7 +12,6 @@ const protectedRoutes = [
    logsPage,
    borrowerRecordsPage,
    scannerPage,
-   configurationsPage,
    settingsPage,
 ];
 

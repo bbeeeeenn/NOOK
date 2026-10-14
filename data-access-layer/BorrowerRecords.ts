@@ -3,12 +3,12 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { cacheLife } from "next/cache";
 import type { Result } from "@/lib/types";
-import { BorrowerModel } from "@/generated/prisma/models";
+import { BorrowerRecordModel } from "@/generated/prisma/models";
 
 export const BORROWERS_PAGE_SIZE = 20;
 
 type PaginatedBorrowers = {
-   borrowers: BorrowerModel[];
+   borrowers: BorrowerRecordModel[];
    total: number;
 };
 
@@ -67,8 +67,8 @@ async function getCachedBorrowerRecords(
    };
 
    const [total, borrowers] = await Promise.all([
-      prisma.borrower.count({ where }),
-      prisma.borrower.findMany({
+      prisma.borrowerRecord.count({ where }),
+      prisma.borrowerRecord.findMany({
          where,
          skip: (page - 1) * pageSize,
          take: pageSize,
@@ -104,5 +104,5 @@ async function getCachedBorrowerRecordsCount() {
    "use cache: remote";
    cacheLife("days");
 
-   return await prisma.borrower.count();
+   return await prisma.borrowerRecord.count();
 }

@@ -16,12 +16,10 @@ import {
    ScrollText,
    Settings,
    UserRound,
-   Wrench,
    X,
 } from "lucide-react";
 import { Nook1 } from "@/components/Images";
 import {
-   configurationsPage,
    logsPage,
    scannerPage,
    settingsPage,
@@ -38,7 +36,6 @@ const links: { label: string; route: string; icon: LucideIcon }[] = [
    { label: "Scanner", route: scannerPage, icon: ScanLine },
    { label: "Student Records", route: borrowerRecordsPage, icon: UserRound },
    { label: "Reports", icon: ScrollText, route: reportsPage },
-   { label: "Configurations", route: configurationsPage, icon: Wrench },
 ];
 
 export default function Sidebar({ children }: { children: React.ReactNode }) {
