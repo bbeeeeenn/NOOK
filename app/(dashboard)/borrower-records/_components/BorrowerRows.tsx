@@ -17,7 +17,6 @@ import { programs } from "@/constants";
 import { BorrowerRecordModel } from "@/generated/prisma/models";
 
 type EditInfo = {
-   id: string;
    name: string;
    idNumber: string;
    yearLevel: number;
@@ -112,7 +111,6 @@ export default function BorrowerRecords({
    const changeCurrentDialog = useChangeDialogRef();
 
    const [infos, setInfos] = useState<EditInfo>({
-      id: "",
       name: "",
       idNumber: "",
       yearLevel: 1,
@@ -148,7 +146,6 @@ export default function BorrowerRecords({
    const onAction = async () => {
       const loadingToast = toast.loading("Updating...");
       const res = await editBorrowerRecord(
-         infos.id,
          infos.idNumber,
          infos.name,
          infos.yearLevel,
@@ -185,7 +182,6 @@ export default function BorrowerRecords({
                borrowerRecord={record}
                onEdit={() =>
                   editNewRow({
-                     id: record.idNumber,
                      college: record.college,
                      idNumber: record.idNumber,
                      name: record.firstname,

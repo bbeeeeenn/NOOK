@@ -8,15 +8,15 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import { revalidatePath } from "next/cache";
 
 export default async function deleteBorrowerRecord(
-   id: string,
+   idNumber: string,
 ): Promise<Result<{ message: string }>> {
    const session = await auth();
    if (!session?.user)
       return { ok: false, error: "AUTH", message: "Unauthorized" };
 
    try {
-      const newRecord = await prisma.borrower.delete({
-         where: { id },
+      const newRecord = await prisma.borrowerRecord.delete({
+         where: { idNumber },
          select: { idNumber: true },
       });
 

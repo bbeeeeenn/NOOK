@@ -9,7 +9,6 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import { revalidatePath } from "next/cache";
 
 export default async function editBorrowerRecord(
-   id: string,
    idNumber: string,
    name: string,
    yearLevel: number,
@@ -21,11 +20,10 @@ export default async function editBorrowerRecord(
       return { ok: false, error: "AUTH", message: "Unauthorized" };
 
    try {
-      const newRecord = await prisma.borrower.update({
-         where: { id },
+      const newRecord = await prisma.borrowerRecord.update({
+         where: { idNumber },
          data: {
-            idNumber,
-            name,
+            firstname: name,
             yearLevel,
             program,
             college,
