@@ -28,9 +28,13 @@ export const authOptions = {
             if (!credentials?.password || !credentials.email) {
                return null;
             }
+
             const user = await prisma.user.findUnique({
-               where: { email: credentials.email as string },
+               where: {
+                  email: (credentials.email as string).trim().toLowerCase(),
+               },
             });
+
             if (
                !user ||
                !user.password ||
@@ -41,11 +45,13 @@ export const authOptions = {
             ) {
                return null;
             }
+
             return {
                id: user.id,
                email: user.email,
                name: user.name,
                image: user.image,
+               userType: user.userType,
             };
          },
       }),
@@ -61,48 +67,38 @@ export const authOptions = {
       // #Signin ##################################################
       async signIn({ user, account }) {
          if (account?.provider === "google" && user.email) {
-            const allowEmails = process.env
+            const allowedEmails = process.env
                .ALLOWED_EMAILS!.toLowerCase()
                .split(";");
+            allowedEmails.push(process.env.ADMIN_EMAIL!.toLowerCase());
             return (
-               allowEmails.includes(user.email) || allowEmails.includes("*")
+               allowedEmails.includes(user.email) || allowedEmails.includes("*")
             );
          }
          return true;
       },
-
       // #JWT #######################################################
-      async jwt({ user, account, token, profile }) {
+      async jwt({ account, user, token, profile }) {
          if (user) {
-            token.id = user.id!;
+            token.role = user.userType;
          }
 
-         // Store Google tokens on initial Google sign-in
-         if (account?.provider === "google") {
-            // Capture the current profile picture and sync it to the DB
-            if (profile?.picture) {
-               token.picture = profile.picture as string;
-               if (token.id) {
-                  await prisma.user.update({
-                     where: { id: token.id as string },
-                     data: { image: profile.picture as string },
-                  });
-               }
+         if (account?.provider === "google" && profile?.picture && token.sub) {
+            const picture = profile.picture as string;
+            if (token.picture !== picture) {
+               await prisma.user.update({
+                  where: { id: token.sub },
+                  data: { image: picture },
+               });
+               token.picture = picture;
             }
          }
-
          return token;
       },
-
       // #Session ################################################
       async session({ session, token }) {
-         if (session.user) {
-            session.user.id = token.id as string;
-            session.user.name = token.name;
-            session.user.email = token.email ?? session.user.email;
-            session.user.image =
-               (token.picture as string) ?? session.user.image;
-         }
+         session.user.id = token.sub!;
+         session.user.userType = token.role;
          return session;
       },
    },
@@ -111,7 +107,7 @@ export const authOptions = {
    session: { strategy: "jwt", maxAge: 60 * 60 * 24 * 7 },
    pages: {
       signIn: adminLoginPage,
-      error: adminLoginPage,
+      error: process.env.NODE_ENV === "production" ? adminLoginPage : undefined,
       signOut: adminLoginPage,
    },
 } satisfies NextAuthConfig;
