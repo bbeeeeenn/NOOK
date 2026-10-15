@@ -87,7 +87,8 @@ export default async function confirmBorrowerImport(
       }
 
       let linkedBorrowLogs = 0;
-      await prisma.$transaction(async (transaction) => {
+      await prisma.$transaction(
+         async (transaction) => {
          const claim = await transaction.borrowerImport.updateMany({
             where: {
                id: importJob.id,
@@ -130,19 +131,19 @@ export default async function confirmBorrowerImport(
                   "college" = EXCLUDED."college",
                   "gender" = EXCLUDED."gender"
             `);
-
-            linkedBorrowLogs += await transaction.$executeRaw(Prisma.sql`
-               UPDATE "BorrowLog" AS logs
-               SET "idNumber" = borrowers."idNumber"
-               FROM "BorrowerRecord" AS borrowers
-               WHERE logs."idNumber" IS NULL
-                 AND logs."scannedId" IS NOT NULL
-                 AND logs."scannedId" = borrowers."idNumber"
-                 AND borrowers."idNumber" = ANY(
-                    ARRAY[${Prisma.join(batch.map((row) => row.idNumber))}]::text[]
-                 )
-            `);
          }
+
+         linkedBorrowLogs = await transaction.$executeRaw(Prisma.sql`
+            UPDATE "BorrowLog" AS logs
+            SET "idNumber" = borrowers."idNumber"
+            FROM "BorrowerRecord" AS borrowers
+            WHERE logs."idNumber" IS NULL
+              AND logs."scannedId" IS NOT NULL
+              AND logs."scannedId" = borrowers."idNumber"
+              AND borrowers."idNumber" = ANY(
+                 ARRAY[${Prisma.join(importRows.map((row) => row.idNumber))}]::text[]
+              )
+         `);
 
          await transaction.borrowerImportAudit.create({
             data: {
@@ -158,7 +159,12 @@ export default async function confirmBorrowerImport(
          await transaction.borrowerImport.delete({
             where: { id: importJob.id },
          });
-      });
+         },
+         {
+            maxWait: 10_000,
+            timeout: 120_000,
+         },
+      );
 
       revalidatePath(borrowerRecordsPage);
       revalidatePath(importBorrowerRecordsPage);
