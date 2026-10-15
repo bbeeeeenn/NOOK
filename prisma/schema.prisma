@@ -32,6 +32,11 @@ model BorrowLog {
   @@index([idNumber, date])
 }
 
+enum Gender {
+  MALE
+  FEMALE
+}
+
 model BorrowerRecord {
   idNumber   String   @id
   firstname  String
@@ -40,11 +45,9 @@ model BorrowerRecord {
   yearLevel  Int
   program    String
   college    String
-  createdAt  DateTime @default(now())
+  gender     Gender
 
   borrowLogs BorrowLog[]
-
-  @@index([createdAt])
 }
 
 model User {
@@ -57,9 +60,44 @@ model User {
 
   accounts      Account[]
   sessions      Session[]
+  borrowerImports BorrowerImport[]
+  importAudits   BorrowerImportAudit[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model BorrowerImport {
+  id          String   @id @default(cuid())
+  filename    String
+  rows        Json
+  totalRows   Int
+  insertCount Int
+  updateCount Int
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime
+  consumedAt  DateTime?
+  createdById String
+
+  createdBy User @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([createdById, expiresAt])
+}
+
+model BorrowerImportAudit {
+  id          String   @id @default(cuid())
+  filename    String
+  totalRows   Int
+  insertCount Int
+  updateCount Int
+  status      String
+  details     String?
+  createdAt   DateTime @default(now())
+  createdById String
+
+  createdBy User @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([createdById, createdAt])
 }
 
 // Below are for authentication purposes

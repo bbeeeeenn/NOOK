@@ -1,6 +1,7 @@
 "use server";
 
 import { borrowerRecordsPage } from "@/constants";
+import { Gender } from "@/generated/prisma/client";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 import { Result } from "@/lib/types";
@@ -13,6 +14,7 @@ export default async function addBorrowerRecord(
    yearLevel: number,
    program: string,
    college: string,
+   gender: Gender,
 ): Promise<Result<{ message: string }>> {
    const session = await auth();
    if (!session?.user)
@@ -27,27 +29,29 @@ export default async function addBorrowerRecord(
             yearLevel: program === "INSTRUCTOR" ? 0 : yearLevel,
             program,
             college,
+            gender,
          },
          select: { idNumber: true },
       });
 
       revalidatePath(borrowerRecordsPage);
       return { ok: true, data: { message: `Created ${newRecord.idNumber}` } };
-   } catch (e) {
-      if (e instanceof PrismaClientKnownRequestError) {
-         if (e.code === "P2002")
+   } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+         if (error.code === "P2002") {
             return {
                ok: false,
-               error: "AUTH",
+               error: "CONFLICT",
                message: "Record with that ID Number already exists",
             };
+         }
          return {
             ok: false,
             error: "DATABASE",
-            message: `Database error: ${e.code}`,
+            message: `Database error: ${error.code}`,
          };
       }
-      console.error(e);
-      return { ok: false, error: "OTHER", message: "Unexpected error occured" };
+      console.error(error);
+      return { ok: false, error: "OTHER", message: "Unexpected error occurred" };
    }
 }

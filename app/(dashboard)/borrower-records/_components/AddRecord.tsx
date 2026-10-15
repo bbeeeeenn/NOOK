@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import { useChangeDialogRef, useDialogRef } from "./DialogProvider";
 import { useRouter } from "next/navigation";
 import { importBorrowerRecordsPage, programs } from "@/constants";
+import type { Gender } from "@/generated/prisma/client";
 
 type Infos = {
    program: (typeof programs)[number] | null;
@@ -76,12 +77,14 @@ export default function AddRecord() {
          (formData.get("yearlevel") ?? "1") as string,
          10,
       );
+      const gender = (formData.get("gender") ?? "MALE") as Gender;
       const res = await addBorrowerRecord(
          idNumber,
          name,
          yearLevel,
          program,
          college,
+         gender,
       );
       if (res.ok) {
          toggleDialog(false);
@@ -172,6 +175,21 @@ export default function AddRecord() {
                      autoComplete="off"
                      required
                   />
+               </label>
+               <label htmlFor="gender">
+                  <span className="mb-1 block text-xs text-gray-600">
+                     Gender
+                  </span>
+                  <select
+                     id="gender"
+                     name="gender"
+                     defaultValue="MALE"
+                     className="font-inter w-full rounded-md p-2 outline-1 outline-gray-200"
+                     required
+                  >
+                     <option value="MALE">MALE</option>
+                     <option value="FEMALE">FEMALE</option>
+                  </select>
                </label>
                <ProgramDropdown value={infos.program} setProgram={setProgram} />
                <CollegeDropdown value={infos.college} setCollege={setCollege} />

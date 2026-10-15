@@ -77,7 +77,7 @@ async function getCachedBorrowerRecords(
          where,
          skip: (page - 1) * pageSize,
          take: pageSize,
-         orderBy: [{ createdAt: "asc" }, { idNumber: "asc" }],
+         orderBy: [{ idNumber: "asc" }],
       }),
    ]);
 
