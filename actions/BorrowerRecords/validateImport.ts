@@ -6,11 +6,11 @@ import {
    validateBorrowerWorkbook,
 } from "@/lib/borrower-import";
 import { auth } from "@/lib/auth/auth";
+import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import type { Result } from "@/lib/types";
 
 const MAX_ERROR_DETAILS = 1_000;
-const ID_QUERY_BATCH_SIZE = 1_000;
 const IMPORT_TOKEN_TTL_MS = 15 * 60 * 1000;
 
 export type BorrowerImportValidationResult = {
@@ -50,6 +50,15 @@ export default async function validateBorrowerImport(
    }
 
    try {
+      await prisma.borrowerImport.deleteMany({
+         where: {
+            OR: [
+               { consumedAt: { not: null } },
+               { expiresAt: { lte: new Date() } },
+            ],
+         },
+      });
+
       const validation = validateBorrowerWorkbook(await file.arrayBuffer());
       const errors = validation.errors.slice(0, MAX_ERROR_DETAILS);
 
@@ -70,21 +79,18 @@ export default async function validateBorrowerImport(
       }
 
       const existingIds = new Set<string>();
-      for (
-         let offset = 0;
-         offset < validation.rows.length;
-         offset += ID_QUERY_BATCH_SIZE
-      ) {
-         const batch = validation.rows.slice(
-            offset,
-            offset + ID_QUERY_BATCH_SIZE,
-         );
-         const existing = await prisma.borrowerRecord.findMany({
-            where: { idNumber: { in: batch.map((row) => row.idNumber) } },
-            select: { idNumber: true },
-         });
-         for (const record of existing) existingIds.add(record.idNumber);
-      }
+      const idNumbers = validation.rows.map((row) => row.idNumber);
+      const existing =
+         idNumbers.length === 0
+            ? []
+            : await prisma.$queryRaw<Array<{ idNumber: string }>>(
+                 Prisma.sql`
+                    SELECT "idNumber"
+                    FROM "BorrowerRecord"
+                    WHERE "idNumber" = ANY(ARRAY[${Prisma.join(idNumbers)}]::text[])
+                 `,
+              );
+      for (const record of existing) existingIds.add(record.idNumber);
 
       const updateCount = existingIds.size;
       const importJob = await prisma.borrowerImport.create({

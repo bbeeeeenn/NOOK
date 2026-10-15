@@ -1,4 +1,3 @@
-import AddRecord from "./_components/AddRecord";
 import {
    BORROWERS_PAGE_SIZE,
    getBorrowerRecords,
@@ -113,15 +112,7 @@ async function SuspendedBorrowerRecords({
          />
          <div className="overflow-x-auto">
             <Table
-               headers={[
-                  "No.",
-                  "ID",
-                  "Name",
-                  "Program",
-                  "Year",
-                  "College",
-                  "Action",
-               ]}
+               headers={["ID", "Name", "Year", "College", "Program"]}
                extraStyling="min-w-150"
             >
                <Suspense fallback={<FallbackRow />}>
@@ -165,7 +156,6 @@ export default async function BorrowerRecordsPage({
          >
             <SuspendedBorrowerRecords searchParams={searchParams} />
          </Suspense>
-         <AddRecord />
       </DialogProvider>
    );
 }

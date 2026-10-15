@@ -5,7 +5,7 @@ import validateBorrowerImport, {
 } from "@/actions/BorrowerRecords/validateImport";
 import confirmBorrowerImport from "@/actions/BorrowerRecords/confirmImport";
 import type { BorrowerImportRow } from "@/lib/borrower-import";
-import { LoaderCircle, Upload } from "lucide-react";
+import { ChevronRight, LoaderCircle, Upload } from "lucide-react";
 import * as XLSX from "xlsx";
 import { useState } from "react";
 
@@ -72,7 +72,7 @@ function SampleTable({
    return (
       <section className="min-w-0">
          <h2 className="mb-2 font-medium">{title}</h2>
-         <div className="overflow-x-auto rounded-lg border border-black/10">
+         <div className="overflow-x-auto rounded-md border border-black/10">
             <table className="min-w-full text-left text-sm">
                <thead className="bg-black/5">
                   <tr>
@@ -87,7 +87,10 @@ function SampleTable({
                   {rows.map((row, index) => (
                      <tr key={`${row.idNumber}-${index}`} className="border-t">
                         {headers.map((header) => (
-                           <td key={header} className="whitespace-nowrap px-3 py-2">
+                           <td
+                              key={header}
+                              className="px-3 py-2 whitespace-nowrap"
+                           >
                               {row[header]}
                            </td>
                         ))}
@@ -101,8 +104,9 @@ function SampleTable({
 }
 
 export default function ImportForm() {
-   const [result, setResult] =
-      useState<BorrowerImportValidationResult | null>(null);
+   const [result, setResult] = useState<BorrowerImportValidationResult | null>(
+      null,
+   );
    const [message, setMessage] = useState<string | null>(null);
    const [messageType, setMessageType] = useState<"error" | "success">("error");
    const [isPending, setIsPending] = useState(false);
@@ -121,7 +125,6 @@ export default function ImportForm() {
          } else {
             setResult(response.data);
          }
-
       } catch (error) {
          console.error("Error submitting borrower import", error);
          setMessage("Unable to validate the workbook. Please try again.");
@@ -141,7 +144,7 @@ export default function ImportForm() {
             return;
          }
          setMessage(
-            `Imported ${response.data.totalRows.toLocaleString()} rows: ${response.data.insertCount.toLocaleString()} created and ${response.data.updateCount.toLocaleString()} updated.`,
+            `Imported ${response.data.totalRows.toLocaleString()} rows: ${response.data.insertCount.toLocaleString()} created, ${response.data.updateCount.toLocaleString()} updated, and ${response.data.linkedBorrowLogs.toLocaleString()} borrow logs linked.`,
          );
          setMessageType("success");
          setResult(null);
@@ -164,9 +167,12 @@ export default function ImportForm() {
 
          <form
             action={onSubmit}
-            className="flex flex-col gap-4 rounded-xl border border-black/10 bg-white p-5 shadow-sm"
+            className="flex flex-col gap-4 rounded-md border border-black/20 bg-white p-5"
          >
-            <label htmlFor="borrower-import-file" className="font-medium">
+            <label
+               htmlFor="borrower-import-file"
+               className="cursor-pointer font-medium"
+            >
                XLSX file
             </label>
             <input
@@ -176,7 +182,7 @@ export default function ImportForm() {
                accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                required
                disabled={isPending}
-               className="rounded-md border border-black/15 p-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-black/5 file:px-3 file:py-2"
+               className="cursor-pointer rounded-md border border-black/15 p-2 text-sm file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-black/5 file:px-3 file:py-2"
             />
             <p className="text-xs text-black/60">
                Required columns, in order: {headers.join(", ")}
@@ -219,11 +225,13 @@ export default function ImportForm() {
 
          {result && (
             <div className="flex flex-col gap-5">
-               <section className="rounded-xl border border-black/10 bg-white p-5 shadow-sm">
+               <section className="rounded-md border border-black/20 bg-white p-5">
                   <h2 className="font-semibold">{result.filename}</h2>
                   <dl className="mt-3 grid gap-3 sm:grid-cols-4">
                      <div>
-                        <dt className="text-xs text-black/60">Rows processed</dt>
+                        <dt className="text-xs text-black/60">
+                           Rows processed
+                        </dt>
                         <dd className="text-lg font-semibold">
                            {result.totalRows.toLocaleString()}
                         </dd>
@@ -241,7 +249,9 @@ export default function ImportForm() {
                         </dd>
                      </div>
                      <div>
-                        <dt className="text-xs text-black/60">Validation errors</dt>
+                        <dt className="text-xs text-black/60">
+                           Validation errors
+                        </dt>
                         <dd className="text-lg font-semibold text-red-700">
                            {result.errorCount.toLocaleString()}
                         </dd>
@@ -250,7 +260,7 @@ export default function ImportForm() {
                </section>
 
                {result.errorCount > 0 ? (
-                  <section className="rounded-xl border border-red-200 bg-red-50 p-5">
+                  <section className="rounded-xl border border-red-300 bg-red-100 p-5">
                      <h2 className="font-semibold text-red-800">
                         Import blocked
                      </h2>
@@ -271,21 +281,36 @@ export default function ImportForm() {
                   </section>
                ) : (
                   <>
-                     <p className="rounded-md bg-green-50 p-3 text-sm text-green-800">
+                     <p className="rounded-md border border-green-600 bg-green-100 p-3 text-sm text-green-800">
                         Workbook validated successfully. Review the first and
                         last 25 rows before continuing.
                      </p>
                      <div className="grid gap-5">
-                        <SampleTable title="First 25 rows" rows={result.firstRows} />
-                        <SampleTable title="Last 25 rows" rows={result.lastRows} />
+                        <SampleTable
+                           title="First 25 rows"
+                           rows={result.firstRows}
+                        />
+                        <SampleTable
+                           title="Last 25 rows"
+                           rows={result.lastRows}
+                        />
                      </div>
                      <button
                         type="button"
                         onClick={onConfirm}
                         disabled={isConfirming || !result.importToken}
-                        className="w-fit rounded-md bg-yellow-primary px-4 py-2 shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
+                        className="bg-yellow-primary flex w-fit items-center justify-center gap-1 rounded-md px-4 py-2 font-medium shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
                      >
-                        {isConfirming ? "Importing..." : "Confirm import"}
+                        {isConfirming ? (
+                           "Importing..."
+                        ) : (
+                           <>
+                              Confirm import
+                              <span>
+                                 <ChevronRight size={20} />
+                              </span>
+                           </>
+                        )}
                      </button>
                   </>
                )}

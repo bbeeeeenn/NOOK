@@ -1,6 +1,10 @@
 "use server";
 
-import { borrowerRecordsPage, logsPage } from "@/constants";
+import {
+   borrowerRecordsPage,
+   importBorrowerRecordsPage,
+   logsPage,
+} from "@/constants";
 import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth/auth";
@@ -23,6 +27,7 @@ export type BorrowerImportResult = {
    totalRows: number;
    insertCount: number;
    updateCount: number;
+   linkedBorrowLogs: number;
 };
 
 export default async function confirmBorrowerImport(
@@ -33,10 +38,18 @@ export default async function confirmBorrowerImport(
       return { ok: false, error: "AUTH", message: "Unauthorized" };
    }
    if (session.user.userType !== "Admin") {
-      return { ok: false, error: "FORBIDDEN", message: "Admin access required" };
+      return {
+         ok: false,
+         error: "FORBIDDEN",
+         message: "Admin access required",
+      };
    }
    if (!importToken) {
-      return { ok: false, error: "VALIDATION", message: "Import token is required" };
+      return {
+         ok: false,
+         error: "VALIDATION",
+         message: "Import token is required",
+      };
    }
 
    try {
@@ -59,7 +72,8 @@ export default async function confirmBorrowerImport(
          return {
             ok: false,
             error: "VALIDATION",
-            message: "Import validation has expired; please upload the file again",
+            message:
+               "Import validation has expired; please upload the file again",
          };
       }
 
@@ -72,6 +86,7 @@ export default async function confirmBorrowerImport(
          };
       }
 
+      let linkedBorrowLogs = 0;
       await prisma.$transaction(async (transaction) => {
          const claim = await transaction.borrowerImport.updateMany({
             where: {
@@ -115,6 +130,18 @@ export default async function confirmBorrowerImport(
                   "college" = EXCLUDED."college",
                   "gender" = EXCLUDED."gender"
             `);
+
+            linkedBorrowLogs += await transaction.$executeRaw(Prisma.sql`
+               UPDATE "BorrowLog" AS logs
+               SET "idNumber" = borrowers."idNumber"
+               FROM "BorrowerRecord" AS borrowers
+               WHERE logs."idNumber" IS NULL
+                 AND logs."scannedId" IS NOT NULL
+                 AND logs."scannedId" = borrowers."idNumber"
+                 AND borrowers."idNumber" = ANY(
+                    ARRAY[${Prisma.join(batch.map((row) => row.idNumber))}]::text[]
+                 )
+            `);
          }
 
          await transaction.borrowerImportAudit.create({
@@ -124,12 +151,17 @@ export default async function confirmBorrowerImport(
                insertCount: importJob.insertCount,
                updateCount: importJob.updateCount,
                status: "SUCCESS",
+               details: `Linked ${linkedBorrowLogs} orphaned borrow logs by scannedId`,
                createdById: session.user.id,
             },
+         });
+         await transaction.borrowerImport.delete({
+            where: { id: importJob.id },
          });
       });
 
       revalidatePath(borrowerRecordsPage);
+      revalidatePath(importBorrowerRecordsPage);
       revalidatePath(logsPage);
       return {
          ok: true,
@@ -138,10 +170,14 @@ export default async function confirmBorrowerImport(
             totalRows: importJob.totalRows,
             insertCount: importJob.insertCount,
             updateCount: importJob.updateCount,
+            linkedBorrowLogs,
          },
       };
    } catch (error) {
-      if (error instanceof Error && error.message === "IMPORT_ALREADY_CONSUMED") {
+      if (
+         error instanceof Error &&
+         error.message === "IMPORT_ALREADY_CONSUMED"
+      ) {
          return {
             ok: false,
             error: "CONFLICT",
