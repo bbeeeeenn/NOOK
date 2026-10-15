@@ -7,7 +7,7 @@ import confirmBorrowerImport from "@/actions/BorrowerRecords/confirmImport";
 import type { BorrowerImportRow } from "@/lib/borrower-import";
 import { ChevronRight, LoaderCircle, Upload } from "lucide-react";
 import * as XLSX from "xlsx";
-import { useState } from "react";
+import { useActionState, useState } from "react";
 
 const headers = [
    "idNumber",
@@ -109,29 +109,28 @@ export default function ImportForm() {
    );
    const [message, setMessage] = useState<string | null>(null);
    const [messageType, setMessageType] = useState<"error" | "success">("error");
-   const [isPending, setIsPending] = useState(false);
    const [isConfirming, setIsConfirming] = useState(false);
 
-   async function onSubmit(formData: FormData) {
-      setMessage(null);
-      setMessageType("error");
-      setResult(null);
-      setIsPending(true);
+   const [, onSubmit, isPending] = useActionState(
+      async (_: unknown, formData: FormData) => {
+         setMessage(null);
+         setMessageType("error");
+         setResult(null);
 
-      try {
-         const response = await validateBorrowerImport(formData);
-         if (!response.ok) {
-            setMessage(response.message);
-         } else {
-            setResult(response.data);
+         try {
+            const response = await validateBorrowerImport(formData);
+            if (!response.ok) {
+               setMessage(response.message);
+            } else {
+               setResult(response.data);
+            }
+         } catch (error) {
+            console.error("Error submitting borrower import", error);
+            setMessage("Unable to validate the workbook. Please try again.");
          }
-      } catch (error) {
-         console.error("Error submitting borrower import", error);
-         setMessage("Unable to validate the workbook. Please try again.");
-      } finally {
-         setIsPending(false);
-      }
-   }
+      },
+      null,
+   );
 
    async function onConfirm() {
       if (!result?.importToken) return;
