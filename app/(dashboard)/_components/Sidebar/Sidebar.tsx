@@ -31,11 +31,21 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 
-const links: { label: string; route: string; icon: LucideIcon }[] = [
+const links: {
+   label: string;
+   route: string;
+   icon: LucideIcon;
+   admin?: boolean;
+}[] = [
    { label: "Borrow Logs", route: logsPage, icon: NotepadText },
    { label: "Scanner", route: scannerPage, icon: ScanLine },
-   { label: "Student Records", route: borrowerRecordsPage, icon: UserRound },
    { label: "Reports", icon: ScrollText, route: reportsPage },
+   {
+      label: "Student Records",
+      route: borrowerRecordsPage,
+      icon: UserRound,
+      admin: true,
+   },
 ];
 
 export default function Sidebar({ children }: { children: React.ReactNode }) {
@@ -67,29 +77,32 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
             </button>
             <Nook1 width={180} className="m-auto mt-15 mb-10 w-45" />
             <div className="font-inter text-white-primary text-lg font-medium">
-               {links.map((l) => (
-                  <Link
-                     key={l.label}
-                     href={l.route}
-                     className={clsx(
-                        "flex items-center gap-2 rounded-md p-3 outline-0",
-                        pathname.includes(l.route)
-                           ? "bg-yellow-primary pointer-events-none text-gray-800 shadow-sm"
-                           : "hover:bg-white/8 focus-visible:bg-white/8",
-                     )}
-                     onClick={() => toggleMobileSidebar(false)}
-                  >
-                     <span>
-                        <l.icon />
-                     </span>
-                     <span className="truncate">{l.label}</span>
-                     {!pathname.includes(l.route) && (
-                        <span className="ml-auto">
-                           <ChevronRight />
-                        </span>
-                     )}
-                  </Link>
-               ))}
+               {links.map(
+                  (l) =>
+                     (!l.admin || session.data?.user.userType === "Admin") && (
+                        <Link
+                           key={l.label}
+                           href={l.route}
+                           className={clsx(
+                              "flex items-center gap-2 rounded-md p-3 outline-0",
+                              pathname.includes(l.route)
+                                 ? "bg-yellow-primary pointer-events-none text-gray-800 shadow-sm"
+                                 : "hover:bg-white/8 focus-visible:bg-white/8",
+                           )}
+                           onClick={() => toggleMobileSidebar(false)}
+                        >
+                           <span>
+                              <l.icon />
+                           </span>
+                           <span className="truncate">{l.label}</span>
+                           {!pathname.includes(l.route) && (
+                              <span className="ml-auto">
+                                 <ChevronRight />
+                              </span>
+                           )}
+                        </Link>
+                     ),
+               )}
             </div>
             <div className="font-inter text-white-primary mt-auto text-lg font-medium">
                <Link

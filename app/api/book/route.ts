@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth/auth";
 import { fetchBook, normalizeIsbn } from "@/lib/fetchBook";
 import { Result } from "@/lib/types";
 import { AxiosError } from "axios";

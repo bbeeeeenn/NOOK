@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "./lib/auth";
+import { auth } from "./lib/auth/auth";
 import {
    adminLoginPage,
    logsPage,
    scannerPage,
    settingsPage,
    borrowerRecordsPage,
+   importBorrowerRecordsPage,
+   reportsPage,
 } from "./constants";
 
 const protectedRoutes = [
@@ -13,6 +15,8 @@ const protectedRoutes = [
    borrowerRecordsPage,
    scannerPage,
    settingsPage,
+   importBorrowerRecordsPage,
+   reportsPage,
 ];
 
 export default async function proxy(req: NextRequest) {

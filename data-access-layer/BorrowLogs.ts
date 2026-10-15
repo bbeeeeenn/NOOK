@@ -1,6 +1,6 @@
 import { Prisma } from "@/generated/prisma/client";
 import { BorrowLogGetPayload } from "@/generated/prisma/models";
-import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 import { Result } from "@/lib/types";
 

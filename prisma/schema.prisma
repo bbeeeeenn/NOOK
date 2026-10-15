@@ -47,11 +47,6 @@ model BorrowerRecord {
   @@index([createdAt])
 }
 
-enum UserType {
-  Admin
-  Staff
-}
-
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -59,7 +54,6 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String?
-  userType      UserType  @default(Staff)
 
   accounts      Account[]
   sessions      Session[]

@@ -1,6 +1,6 @@
 import { UserShield } from "lucide-react";
 import ChangePassword from "./_components/ChangePassword";
-import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth/auth";
 import { redirect } from "next/navigation";
 import { adminLoginPage } from "@/constants";
 import { prisma } from "@/lib/prisma";

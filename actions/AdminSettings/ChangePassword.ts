@@ -2,7 +2,7 @@
 
 import { settingsPage } from "@/constants";
 import { Prisma } from "@/generated/prisma/client";
-import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth/auth";
 import { compareData, hashData } from "@/lib/bcrypt";
 import { prisma } from "@/lib/prisma";
 import { Result } from "@/lib/types";

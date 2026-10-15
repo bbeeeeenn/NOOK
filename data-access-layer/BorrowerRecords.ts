@@ -1,9 +1,11 @@
 import { Prisma } from "@/generated/prisma/client";
-import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 import { cacheLife } from "next/cache";
 import type { Result } from "@/lib/types";
 import { BorrowerRecordModel } from "@/generated/prisma/models";
+import { redirect } from "next/navigation";
+import { logsPage } from "@/constants";
 
 export const BORROWERS_PAGE_SIZE = 20;
 
@@ -23,6 +25,9 @@ export async function getBorrowerRecords(
    const session = await auth();
    if (!session?.user) {
       return { ok: false, error: "AUTH", message: "Unauthorized" };
+   }
+   if (session.user.userType !== "Admin") {
+      redirect(logsPage);
    }
 
    try {

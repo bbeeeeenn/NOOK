@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Login from "./LoginComponent";
-import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth/auth";
 import { redirect } from "next/navigation";
 import { logsPage } from "@/constants";
 import { Suspense } from "react";
