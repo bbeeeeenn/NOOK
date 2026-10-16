@@ -22,7 +22,6 @@ import { Result } from "@/lib/types";
 export default async function createBorrowLog(
    idNumber: string,
    bookCode: string,
-   isbn: string,
 ): Promise<Result<{ message: string }>> {
    return {
       ok: false,

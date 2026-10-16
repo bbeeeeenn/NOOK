@@ -11,7 +11,7 @@ import {
    X,
 } from "lucide-react";
 import axios, { AxiosError } from "axios";
-import { bookInfosRoute, borrowerInfoRoute } from "@/constants";
+import { borrowerInfoRoute } from "@/constants";
 import { Result } from "@/lib/types";
 import createBorrowLog from "@/actions/BorrowLogs/createBorrowLog";
 import { toast } from "react-toastify";
@@ -81,7 +81,7 @@ export default function FinalizeDialog({
    resetAll: () => void;
 }) {
    const bookInfo = useFetchResource<{ title: string; authors: string }>(
-      infos.bookISBN.trim() ? `${bookInfosRoute}?isbn=${infos.bookISBN}` : null,
+      "infos.bookISBN.trim() ? `${bookInfosRoute}?isbn=${infos.bookISBN}` : null,", // Broken
    );
    const studentInfo = useFetchResource<BorrowerInfo>(
       `${borrowerInfoRoute}?idNumber=${infos.borrowerId}`,
@@ -93,11 +93,7 @@ export default function FinalizeDialog({
       if (isPending) return;
       setIsPending(true);
       setError(null);
-      const res = await createBorrowLog(
-         infos.borrowerId,
-         infos.bookCode,
-         infos.bookISBN,
-      );
+      const res = await createBorrowLog(infos.borrowerId, infos.bookCode);
       if (res.ok) {
          toast.success(res.data.message, { autoClose: 3000 });
          toggle();
@@ -133,7 +129,7 @@ export default function FinalizeDialog({
                   {
                      label: "Book ISBN",
                      icon: BookOpen,
-                     data: infos.bookISBN.trim() || "N/A",
+                     data: "", // Broken
                   },
                ].map((e, i) => (
                   <React.Fragment key={e.label}>

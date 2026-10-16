@@ -3,13 +3,12 @@ import { Library } from "@/components/Images";
 import { Scanner } from "@yudiel/react-qr-scanner";
 import clsx from "clsx";
 import { ChevronLeft } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import FinalizeDialog from "./_components/finalizeDialog";
 
 export type BorrowData = {
    borrowerId: string;
    bookCode: string;
-   bookISBN: string;
 };
 
 type Process = {
@@ -26,7 +25,6 @@ export default function ScannerPage() {
    const [infos, setInfos] = useState<BorrowData>({
       borrowerId: "",
       bookCode: "",
-      bookISBN: "",
    });
    const finalizeDialogRef = useRef<HTMLDialogElement>(null);
 
@@ -48,15 +46,6 @@ export default function ScannerPage() {
          name: "bookCode",
          inputValue: infos.bookCode,
       },
-      {
-         label: "Book ISBN",
-         description:
-            "Scan the book’s ISBN, or enter it manually above to auto-fill the title and author.",
-         placeholder: "ISBN",
-         name: "bookISBN",
-         inputValue: infos.bookISBN,
-         optional: true,
-      },
    ];
    const currentStep = processSteps[step];
 
@@ -77,9 +66,15 @@ export default function ScannerPage() {
    const prevStep = () => setStep((prev) => (prev - 1 >= 0 ? prev - 1 : prev));
 
    const resetAll = () => {
-      setInfos({ bookCode: "", bookISBN: "", borrowerId: "" });
+      setInfos({ bookCode: "", borrowerId: "" });
       setStep(0);
    };
+
+   const sent = useRef(false);
+   useEffect(() => {
+      if (!sent.current) window.alert("This page is about to be changed.");
+      sent.current = true;
+   }, []);
 
    return (
       <div className="relative min-h-[calc(100dvh-85px)] bg-[#003300]/90 p-7 select-none">
