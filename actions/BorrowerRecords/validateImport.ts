@@ -1,3 +1,8 @@
+/*
+   Validates the xlsx file
+   Creates `BorrowerImport` row
+*/
+
 "use server";
 
 import {
@@ -33,12 +38,20 @@ export default async function validateBorrowerImport(
       return { ok: false, error: "AUTH", message: "Unauthorized" };
    }
    if (session.user.userType !== "Admin") {
-      return { ok: false, error: "FORBIDDEN", message: "Admin access required" };
+      return {
+         ok: false,
+         error: "FORBIDDEN",
+         message: "Admin access required",
+      };
    }
 
    const file = formData.get("file");
    if (!(file instanceof File)) {
-      return { ok: false, error: "VALIDATION", message: "Please select an XLSX file" };
+      return {
+         ok: false,
+         error: "VALIDATION",
+         message: "Please select an XLSX file",
+      };
    }
 
    if (!file.name.toLowerCase().endsWith(".xlsx")) {

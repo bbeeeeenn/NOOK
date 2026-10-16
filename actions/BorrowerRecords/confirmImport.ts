@@ -1,3 +1,8 @@
+/*
+   Completes the import by inserting the `BorrowerImport` rows to `BorrowerRecords`
+   Links orphaned data from `BorrowLog` to new imported `BorrwerRecords`
+*/
+
 "use server";
 
 import {
@@ -86,26 +91,30 @@ export default async function confirmBorrowerImport(
          };
       }
 
-      let linkedBorrowLogs = 0;
+      let linkedBorrowLogsCount = 0;
       await prisma.$transaction(
          async (transaction) => {
-         const claim = await transaction.borrowerImport.updateMany({
-            where: {
-               id: importJob.id,
-               consumedAt: null,
-               expiresAt: { gt: new Date() },
-            },
-            data: { consumedAt: new Date() },
-         });
-         if (claim.count !== 1) {
-            throw new Error("IMPORT_ALREADY_CONSUMED");
-         }
+            const claim = await transaction.borrowerImport.updateMany({
+               where: {
+                  id: importJob.id,
+                  consumedAt: null,
+                  expiresAt: { gt: new Date() },
+               },
+               data: { consumedAt: new Date() },
+            });
+            if (claim.count !== 1) {
+               throw new Error("IMPORT_ALREADY_CONSUMED");
+            }
 
-         const importRows = rows as ImportRow[];
-         const batchSize = 500;
-         for (let offset = 0; offset < importRows.length; offset += batchSize) {
-            const batch = importRows.slice(offset, offset + batchSize);
-            await transaction.$executeRaw(Prisma.sql`
+            const importRows = rows as ImportRow[];
+            const batchSize = 500;
+            for (
+               let offset = 0;
+               offset < importRows.length;
+               offset += batchSize
+            ) {
+               const batch = importRows.slice(offset, offset + batchSize);
+               await transaction.$executeRaw(Prisma.sql`
                INSERT INTO "BorrowerRecord"
                   ("idNumber", "firstname", "middlename", "lastname", "yearLevel", "program", "college", "gender")
                VALUES ${Prisma.join(
@@ -131,9 +140,9 @@ export default async function confirmBorrowerImport(
                   "college" = EXCLUDED."college",
                   "gender" = EXCLUDED."gender"
             `);
-         }
+            }
 
-         linkedBorrowLogs = await transaction.$executeRaw(Prisma.sql`
+            linkedBorrowLogsCount = await transaction.$executeRaw(Prisma.sql`
             UPDATE "BorrowLog" AS logs
             SET "idNumber" = borrowers."idNumber"
             FROM "BorrowerRecord" AS borrowers
@@ -145,20 +154,20 @@ export default async function confirmBorrowerImport(
               )
          `);
 
-         await transaction.borrowerImportAudit.create({
-            data: {
-               filename: importJob.filename,
-               totalRows: importJob.totalRows,
-               insertCount: importJob.insertCount,
-               updateCount: importJob.updateCount,
-               status: "SUCCESS",
-               details: `Linked ${linkedBorrowLogs} orphaned borrow logs by scannedId`,
-               createdById: session.user.id,
-            },
-         });
-         await transaction.borrowerImport.delete({
-            where: { id: importJob.id },
-         });
+            await transaction.borrowerImportAudit.create({
+               data: {
+                  filename: importJob.filename,
+                  totalRows: importJob.totalRows,
+                  insertCount: importJob.insertCount,
+                  updateCount: importJob.updateCount,
+                  status: "SUCCESS",
+                  details: `Linked ${linkedBorrowLogsCount} orphaned borrow logs by scannedId`,
+                  createdById: session.user.id,
+               },
+            });
+            await transaction.borrowerImport.delete({
+               where: { id: importJob.id },
+            });
          },
          {
             maxWait: 10_000,
@@ -176,7 +185,7 @@ export default async function confirmBorrowerImport(
             totalRows: importJob.totalRows,
             insertCount: importJob.insertCount,
             updateCount: importJob.updateCount,
-            linkedBorrowLogs,
+            linkedBorrowLogs: linkedBorrowLogsCount,
          },
       };
    } catch (error) {

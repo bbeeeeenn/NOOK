@@ -74,6 +74,7 @@ function addRequiredFieldError(
    }
 }
 
+// Returns xlsx validation result
 export function validateBorrowerWorkbook(
    input: ArrayBuffer | Uint8Array,
 ): BorrowerImportValidation {
