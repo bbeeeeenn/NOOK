@@ -13,8 +13,6 @@ import {
 import axios, { AxiosError } from "axios";
 import { borrowerInfoRoute } from "@/constants";
 import { Result } from "@/lib/types";
-import createBorrowLog from "@/actions/BorrowLogs/createBorrowLog";
-import { toast } from "react-toastify";
 import clsx from "clsx";
 
 type BorrowerInfo = {
@@ -93,14 +91,14 @@ export default function FinalizeDialog({
       if (isPending) return;
       setIsPending(true);
       setError(null);
-      const res = await createBorrowLog(infos.borrowerId, infos.bookCode);
-      if (res.ok) {
-         toast.success(res.data.message, { autoClose: 3000 });
-         toggle();
-         resetAll();
-      } else {
-         setError(res.message);
-      }
+      // const res = await createBorrowLog(infos.borrowerId, infos.bookCode);
+      // if (res.ok) {
+      //    toast.success(res.data.message, { autoClose: 3000 });
+      //    toggle();
+      //    resetAll();
+      // } else {
+      //    setError(res.message);
+      // }
       setIsPending(false);
    };
 
@@ -184,15 +182,11 @@ export default function FinalizeDialog({
                         <div className="rounded-md bg-white/10 px-4 py-2 font-medium">
                            {bookInfo.status === "found" ? (
                               <>
-                                 <>
-                                    <p className="text-xs text-white/90">
-                                       Book
-                                    </p>
-                                    <p>{bookInfo.data.title}</p>
-                                    <p className="text-sm text-white/95">
-                                       {bookInfo.data.authors}
-                                    </p>
-                                 </>
+                                 <p className="text-xs text-white/90">Book</p>
+                                 <p>{bookInfo.data.title}</p>
+                                 <p className="text-sm text-white/95">
+                                    {bookInfo.data.authors}
+                                 </p>
                               </>
                            ) : bookInfo.status === "pending" ? (
                               <span className="flex items-center gap-2 text-white/80">
