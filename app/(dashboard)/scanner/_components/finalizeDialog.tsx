@@ -71,7 +71,6 @@ export default function FinalizeDialog({
    infos,
    ref,
    toggle,
-   resetAll,
 }: {
    infos: BorrowData;
    ref: RefObject<HTMLDialogElement | null>;

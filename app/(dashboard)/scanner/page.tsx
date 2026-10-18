@@ -3,7 +3,7 @@ import { Library } from "@/components/Images";
 import { Scanner } from "@yudiel/react-qr-scanner";
 import clsx from "clsx";
 import { ChevronLeft } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import FinalizeDialog from "./_components/finalizeDialog";
 
 export type BorrowData = {
@@ -69,12 +69,6 @@ export default function ScannerPage() {
       setInfos({ bookCode: "", borrowerId: "" });
       setStep(0);
    };
-
-   const sent = useRef(false);
-   useEffect(() => {
-      if (!sent.current) window.alert("This page is about to be changed.");
-      sent.current = true;
-   }, []);
 
    return (
       <div className="relative min-h-[calc(100dvh-85px)] bg-[#003300]/90 p-7 select-none">
