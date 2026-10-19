@@ -1,19 +1,19 @@
+import { BorrowerRecordGetPayload } from "@/generated/prisma/models";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 import { Result } from "@/lib/types";
 import { cacheLife, cacheTag, updateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
-type BorrowerInfo = {
-   name: string;
-   yearLevel: number;
-   program: string;
-   college: string;
-};
-
 export async function GET(
    req: NextRequest,
-): Promise<NextResponse<Result<BorrowerInfo>>> {
+): Promise<
+   NextResponse<
+      Result<
+         BorrowerRecordGetPayload<{ omit: { gender: true; idNumber: true } }>
+      >
+   >
+> {
    const idNumberQuery = req.nextUrl.searchParams.get("idNumber");
    if (!idNumberQuery)
       return NextResponse.json({
@@ -37,14 +37,15 @@ export async function GET(
          return NextResponse.json({
             ok: false,
             error: "NOT_FOUND",
-            message: "Record not found",
+            message: "Borrower record not found",
          });
 
-      const { firstname, yearLevel, program, college } = borrower;
+      const { firstname, middlename, lastname, yearLevel, program, college } =
+         borrower;
 
       return NextResponse.json({
          ok: true,
-         data: { name: firstname, yearLevel, program, college },
+         data: { firstname, middlename, lastname, yearLevel, program, college },
       });
    } catch (e) {
       console.error(e);

@@ -154,3 +154,19 @@ button {
       @apply font-sans;
    }
 }
+
+.borrowconfirmationcard {
+   opacity: 1;
+   transform: translateY(0);
+
+   transition:
+      opacity 0.3s,
+      transform 0.3s;
+}
+
+@starting-style {
+   .borrowconfirmationcard {
+      opacity: 0;
+      transform: translateY(100px);
+   }
+}

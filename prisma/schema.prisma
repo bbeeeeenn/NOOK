@@ -24,6 +24,7 @@ model BorrowLog {
   bookBarcode String
 
   borrower BorrowerRecord? @relation(fields: [idNumber], references: [idNumber])
+  book BookRecord @relation(fields: [bookBarcode], references: [copyCode])
 
   @@index([date])
   @@index([type])
@@ -37,6 +38,8 @@ model BookRecord {
   author String
   sublocation String
   circulationType String
+
+  borrowLog BorrowLog[]
 }
 
 enum Gender {
