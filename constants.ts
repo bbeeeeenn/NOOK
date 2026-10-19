@@ -14,7 +14,7 @@ export const offeredProgramsRoute = "/api/programs";
 export const bookInfosRoute = "/api/book";
 export const borrowerInfoRoute = "/api/borrower";
 
-export const GOOGLE_BOOKS_API_KEY = process.env.GOOGLE_BOOKS_API_KEY!;
+// export const GOOGLE_BOOKS_API_KEY = process.env.GOOGLE_BOOKS_API_KEY!;
 
 export const programs = [
    {

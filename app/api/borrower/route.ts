@@ -14,13 +14,13 @@ export async function GET(
       >
    >
 > {
-   const idNumberQuery = req.nextUrl.searchParams.get("idNumber");
+   const idNumberQuery = req.nextUrl.searchParams.get("idNumber")?.trim();
    if (!idNumberQuery)
       return NextResponse.json({
          ok: false,
          error: "VALIDATION",
-         message: "Please provide an idNumber in search params",
-      });
+         message: "Please provide an ID number in search params",
+      }, { status: 400 });
 
    const session = await auth();
    if (!session?.user) {
@@ -28,7 +28,7 @@ export async function GET(
          ok: false,
          error: "AUTH",
          message: "Unauthorized",
-      });
+      }, { status: 401 });
    }
 
    try {
@@ -38,7 +38,7 @@ export async function GET(
             ok: false,
             error: "NOT_FOUND",
             message: "Borrower record not found",
-         });
+         }, { status: 404 });
 
       const { firstname, middlename, lastname, yearLevel, program, college } =
          borrower;
@@ -51,9 +51,9 @@ export async function GET(
       console.error(e);
       return NextResponse.json({
          ok: false,
-         error: "OTHER",
+         error: "DATABASE",
          message: "Unexpected error",
-      });
+      }, { status: 500 });
    }
 }
 

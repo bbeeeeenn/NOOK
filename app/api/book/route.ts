@@ -1,19 +1,19 @@
 import { auth } from "@/lib/auth/auth";
-import { fetchBook, normalizeIsbn } from "@/lib/fetchBook";
+import { prisma } from "@/lib/prisma";
 import { Result } from "@/lib/types";
-import { AxiosError } from "axios";
+import { cacheLife, cacheTag, updateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
    req: NextRequest,
 ): Promise<NextResponse<Result<{ title: string; authors: string }>>> {
-   const isbn = normalizeIsbn(req.nextUrl.searchParams.get("isbn") ?? "");
-   if (!isbn)
+   const bookCode = req.nextUrl.searchParams.get("code")?.trim();
+   if (!bookCode)
       return NextResponse.json({
          ok: false,
          error: "VALIDATION",
-         message: "Please provide an isbn in search params",
-      });
+         message: "Please provide the book's barcode in search params",
+      }, { status: 400 });
 
    const session = await auth();
    if (!session?.user)
@@ -21,35 +21,42 @@ export async function GET(
          ok: false,
          error: "AUTH",
          message: "Unauthorized",
-      });
+      }, { status: 401 });
 
    try {
-      const data = await fetchBook(isbn);
+      const data = await getBook(bookCode);
       if (!data)
          return NextResponse.json({
             ok: false,
             error: "NOT_FOUND",
             message: "Not found",
-         });
+         }, { status: 404 });
 
       return NextResponse.json({
          ok: true,
-         data: { title: data.title, authors: data.authors },
+         data: { title: data.title, authors: data.author },
       });
    } catch (e) {
-      if (e instanceof AxiosError) {
-         console.error(e);
-         return NextResponse.json({
-            ok: false,
-            error: "OTHER",
-            message: e.message,
-         });
-      }
       console.error(e);
       return NextResponse.json({
          ok: false,
-         error: "OTHER",
+         error: "DATABASE",
          message: "Unexpected error",
-      });
+      }, { status: 500 });
    }
+}
+
+async function getBook(bookCode: string) {
+   "use cache: remote";
+   cacheLife("days");
+   cacheTag(`book:${bookCode}`);
+
+   return prisma.bookRecord.findUnique({
+      where: { copyCode: bookCode },
+      select: { title: true, author: true },
+   });
+}
+
+export function updateBookCache(bookCode: string) {
+   updateTag(`book:${bookCode}`);
 }
