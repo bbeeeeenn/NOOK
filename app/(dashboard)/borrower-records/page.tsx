@@ -1,7 +1,7 @@
 import {
    BORROWERS_PAGE_SIZE,
    getBorrowerRecords,
-} from "@/data-access-layer/BorrowerRecords";
+} from "@/data-access-layer/borrowerRecords";
 import { adminLoginPage } from "@/constants";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";

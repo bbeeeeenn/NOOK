@@ -2,7 +2,7 @@ import { Prisma } from "@/generated/prisma/client";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 import { cacheLife } from "next/cache";
-import type { Result } from "@/lib/types";
+import type { Result } from "@/types/types";
 import { BorrowerRecordModel } from "@/generated/prisma/models";
 import { redirect } from "next/navigation";
 import { logsPage } from "@/constants";

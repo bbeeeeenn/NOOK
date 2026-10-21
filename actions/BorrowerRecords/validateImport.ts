@@ -13,7 +13,7 @@ import {
 import { auth } from "@/lib/auth/auth";
 import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
-import type { Result } from "@/lib/types";
+import type { Result } from "@/types/types";
 
 const MAX_ERROR_DETAILS = 1_000;
 const IMPORT_TOKEN_TTL_MS = 15 * 60 * 1000;

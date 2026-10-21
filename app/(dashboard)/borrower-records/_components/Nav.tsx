@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { getBorrowerRecordsCount } from "@/data-access-layer/BorrowerRecords";
+import { getBorrowerRecordsCount } from "@/data-access-layer/borrowerRecords";
 import { redirect } from "next/navigation";
 import {
    adminLoginPage,

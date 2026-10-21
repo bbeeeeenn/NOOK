@@ -4,7 +4,7 @@ import { updateBorrowerCache } from "@/app/api/borrower/route";
 import { borrowerRecordsPage, logsPage } from "@/constants";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
-import { Result } from "@/lib/types";
+import { Result } from "@/types/types";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import { revalidatePath } from "next/cache";
 

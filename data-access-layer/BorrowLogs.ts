@@ -2,7 +2,7 @@ import { Prisma } from "@/generated/prisma/client";
 import { BorrowLogGetPayload } from "@/generated/prisma/models";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
-import { Result } from "@/lib/types";
+import { Result } from "@/types/types";
 
 export const LOGS_PAGE_SIZE = 20;
 

@@ -5,7 +5,7 @@ import { Prisma } from "@/generated/prisma/client";
 import { auth } from "@/lib/auth/auth";
 import { compareData, hashData } from "@/lib/bcrypt";
 import { prisma } from "@/lib/prisma";
-import { Result } from "@/lib/types";
+import { Result } from "@/types/types";
 import { revalidatePath } from "next/cache";
 
 export default async function changePasswordAction(

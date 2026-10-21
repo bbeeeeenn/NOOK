@@ -13,7 +13,7 @@ import {
 import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth/auth";
-import type { Result } from "@/lib/types";
+import type { Result } from "@/types/types";
 import { revalidatePath } from "next/cache";
 
 type ImportRow = {

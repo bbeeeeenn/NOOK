@@ -2,7 +2,7 @@ import { Prisma } from "@/generated/prisma/client";
 import { colleges } from "@/constants";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
-import { Result } from "@/lib/types";
+import { Result } from "@/types/types";
 
 export type CollegeBorrowerCount = {
    college: string;

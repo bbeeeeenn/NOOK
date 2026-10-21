@@ -1,6 +1,6 @@
 "use client";
 
-import changePasswordAction from "@/actions/AdminSettings/ChangePassword";
+import changePasswordAction from "@/actions/AdminSettings/changePassword";
 import clsx from "clsx";
 import { Eye, EyeClosed, LoaderCircle, SquarePen } from "lucide-react";
 import Image from "next/image";

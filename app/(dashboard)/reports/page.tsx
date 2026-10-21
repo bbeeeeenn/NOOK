@@ -2,7 +2,7 @@ import FallbackRow from "@/components/table/fallbackRow";
 import Table from "@/components/table/table";
 import TableRow from "@/components/table/tableRow";
 import { adminLoginPage } from "@/constants";
-import getCollegeBorrowerCounts from "@/data-access-layer/CollegeBorrowers";
+import getCollegeBorrowerCounts from "@/data-access-layer/collegeBorrowers";
 import { endOfMonth, format, isValid, parse, startOfMonth } from "date-fns";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";

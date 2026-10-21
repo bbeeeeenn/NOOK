@@ -1,4 +1,4 @@
-import { TopBorrowers } from "@/data-access-layer/TopBorrowers";
+import { TopBorrowers } from "@/data-access-layer/topBorrowers";
 
 const COLORS = [
    "#fbbc05",

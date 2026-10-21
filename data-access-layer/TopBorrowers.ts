@@ -1,7 +1,7 @@
 import { PickEnumerable } from "@/generated/prisma/internal/prismaNamespace";
 import { BorrowLogGroupByOutputType } from "@/generated/prisma/models";
 import { prisma } from "@/lib/prisma";
-import { Result } from "@/lib/types";
+import { Result } from "@/types/types";
 import { cacheLife } from "next/cache";
 
 export type TopBorrowers = (PickEnumerable<

@@ -1,4 +1,4 @@
-import getTopBorrowers from "@/data-access-layer/TopBorrowers";
+import getTopBorrowers from "@/data-access-layer/topBorrowers";
 import { Nook2 } from "../../components/Images";
 import TopBorrowerTable from "./TopBorrowerTable";
 import { Suspense } from "react";

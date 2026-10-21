@@ -4,7 +4,7 @@ import { logsPage } from "@/constants";
 import { PatronType } from "@/generated/prisma/enums";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
-import { Result } from "@/lib/types";
+import { Result } from "@/types/types";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import { revalidatePath } from "next/cache";
 

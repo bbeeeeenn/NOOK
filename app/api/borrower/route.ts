@@ -1,7 +1,7 @@
 import { BorrowerRecordGetPayload } from "@/generated/prisma/models";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
-import { Result } from "@/lib/types";
+import { Result } from "@/types/types";
 import { cacheLife, cacheTag, updateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -16,29 +16,38 @@ export async function GET(
 > {
    const idNumberQuery = req.nextUrl.searchParams.get("idNumber")?.trim();
    if (!idNumberQuery)
-      return NextResponse.json({
-         ok: false,
-         error: "VALIDATION",
-         message: "Please provide an ID number in search params",
-      }, { status: 400 });
+      return NextResponse.json(
+         {
+            ok: false,
+            error: "VALIDATION",
+            message: "Please provide an ID number in search params",
+         },
+         { status: 400 },
+      );
 
    const session = await auth();
    if (!session?.user) {
-      return NextResponse.json({
-         ok: false,
-         error: "AUTH",
-         message: "Unauthorized",
-      }, { status: 401 });
+      return NextResponse.json(
+         {
+            ok: false,
+            error: "AUTH",
+            message: "Unauthorized",
+         },
+         { status: 401 },
+      );
    }
 
    try {
       const borrower = await getBorrower(idNumberQuery);
       if (!borrower)
-         return NextResponse.json({
-            ok: false,
-            error: "NOT_FOUND",
-            message: "Borrower record not found",
-         }, { status: 404 });
+         return NextResponse.json(
+            {
+               ok: false,
+               error: "NOT_FOUND",
+               message: "Borrower record not found",
+            },
+            { status: 404 },
+         );
 
       const { firstname, middlename, lastname, yearLevel, program, college } =
          borrower;
@@ -49,11 +58,14 @@ export async function GET(
       });
    } catch (e) {
       console.error(e);
-      return NextResponse.json({
-         ok: false,
-         error: "DATABASE",
-         message: "Unexpected error",
-      }, { status: 500 });
+      return NextResponse.json(
+         {
+            ok: false,
+            error: "DATABASE",
+            message: "Unexpected error",
+         },
+         { status: 500 },
+      );
    }
 }
 

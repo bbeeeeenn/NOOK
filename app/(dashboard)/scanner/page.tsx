@@ -3,7 +3,7 @@ import {
    BookRecordGetPayload,
    BorrowerRecordGetPayload,
 } from "@/generated/prisma/models";
-import { Result } from "@/lib/types";
+import { Result } from "@/types/types";
 import { Scanner } from "@yudiel/react-qr-scanner";
 import clsx from "clsx";
 import {

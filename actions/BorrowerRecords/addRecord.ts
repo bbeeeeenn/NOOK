@@ -4,7 +4,7 @@ import { borrowerRecordsPage } from "@/constants";
 import { Gender } from "@/generated/prisma/client";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
-import { Result } from "@/lib/types";
+import { Result } from "@/types/types";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import { revalidatePath } from "next/cache";
 
@@ -52,6 +52,10 @@ export default async function addBorrowerRecord(
          };
       }
       console.error(error);
-      return { ok: false, error: "OTHER", message: "Unexpected error occurred" };
+      return {
+         ok: false,
+         error: "OTHER",
+         message: "Unexpected error occurred",
+      };
    }
 }

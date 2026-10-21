@@ -2,7 +2,7 @@ import FallbackRow from "@/components/table/fallbackRow";
 import Table from "@/components/table/table";
 import TableRow from "@/components/table/tableRow";
 import { adminLoginPage } from "@/constants";
-import getTopBorrowers from "@/data-access-layer/TopBorrowers";
+import getTopBorrowers from "@/data-access-layer/topBorrowers";
 import { endOfDay, parseISO, startOfDay } from "date-fns";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
