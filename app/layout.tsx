@@ -7,7 +7,6 @@ import {
    IBM_Plex_Sans,
 } from "next/font/google";
 import "./globals.css";
-import clsx from "clsx";
 import { AuthProvider } from "./sessionProvider";
 import { ToastContainer } from "react-toastify";
 import { cn } from "@/lib/utils";
@@ -44,13 +43,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <html
          lang="en"
          className={cn(
-            clsx(
-               funnelSans.variable,
-               inter.variable,
-               roboto.variable,
-               plexSans.variable,
-               "h-full antialiased",
-            ),
+            funnelSans.variable,
+            inter.variable,
+            roboto.variable,
+            plexSans.variable,
+            "h-full antialiased",
             "font-sans",
             geist.variable,
          )}
