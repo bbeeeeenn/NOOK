@@ -8,7 +8,7 @@ import {
    useSidebar,
 } from "./SidebarContextProvider";
 import {
-   ChevronRight,
+   BookText,
    LucideIcon,
    Menu,
    NotepadText,
@@ -25,27 +25,38 @@ import {
    settingsPage,
    borrowerRecordsPage,
    reportsPage,
+   bookRecordsPage,
 } from "@/constants";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import LinkItem from "./Link";
 
 const links: {
    label: string;
    route: string;
    icon: LucideIcon;
    admin?: boolean;
-}[] = [
-   { label: "Borrow Logs", route: logsPage, icon: NotepadText },
-   { label: "Scanner", route: scannerPage, icon: ScanLine },
-   { label: "Reports", icon: ScrollText, route: reportsPage },
-   {
-      label: "Student Records",
-      route: borrowerRecordsPage,
-      icon: UserRound,
-      admin: true,
-   },
+}[][] = [
+   [
+      { label: "Borrow Logs", route: logsPage, icon: NotepadText },
+      { label: "Scanner", route: scannerPage, icon: ScanLine },
+      { label: "Reports", icon: ScrollText, route: reportsPage },
+   ],
+   [
+      {
+         label: "Student Records",
+         route: borrowerRecordsPage,
+         icon: UserRound,
+         admin: true,
+      },
+      {
+         label: "Book Records",
+         route: bookRecordsPage,
+         icon: BookText,
+         admin: true,
+      },
+   ],
 ];
 
 export default function Sidebar({ children }: { children: React.ReactNode }) {
@@ -77,43 +88,34 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
             </button>
             <Nook1 width={180} className="m-auto mt-15 mb-10 w-45" />
             <div className="font-inter text-white-primary text-lg font-medium">
-               {links.map(
-                  (l) =>
-                     (!l.admin || session.data?.user.userType === "Admin") && (
-                        <Link
-                           key={l.label}
-                           href={l.route}
-                           className={clsx(
-                              "flex items-center gap-2 rounded-md p-3 outline-0",
-                              pathname.includes(l.route)
-                                 ? "bg-yellow-primary pointer-events-none text-gray-800 shadow-sm"
-                                 : "hover:bg-white/8 focus-visible:bg-white/8",
-                           )}
-                           onClick={() => toggleMobileSidebar(false)}
-                        >
-                           <span>
-                              <l.icon />
-                           </span>
-                           <span className="truncate">{l.label}</span>
-                           {!pathname.includes(l.route) && (
-                              <span className="ml-auto">
-                                 <ChevronRight />
-                              </span>
-                           )}
-                        </Link>
-                     ),
-               )}
+               {links.map((group, i) => (
+                  <React.Fragment key={i}>
+                     <div className="space-y-1">
+                        {group.map(
+                           (link) =>
+                              (!link.admin ||
+                                 session.data?.user.userType === "Admin") && (
+                                 <LinkItem
+                                    key={link.route}
+                                    href={link.route}
+                                    label={link.label}
+                                 >
+                                    <link.icon />
+                                 </LinkItem>
+                              ),
+                        )}
+                     </div>
+                     {i + 1 < links.length && (
+                        <div className="mx-auto my-3 h-px bg-white/30" />
+                     )}
+                  </React.Fragment>
+               ))}
             </div>
             <div className="font-inter text-white-primary mt-auto text-lg font-medium">
-               <Link
+               {/* the same as the previous div with `mt-auto` to separate them */}
+               <LinkItem
                   href={settingsPage}
-                  className={clsx(
-                     "flex items-center gap-2 rounded-md p-3 outline-0",
-                     pathname.includes(settingsPage)
-                        ? "bg-yellow-primary pointer-events-none text-gray-800 shadow-sm"
-                        : "hover:bg-white/8 focus-visible:bg-white/8",
-                  )}
-                  onClick={() => toggleMobileSidebar(false)}
+                  label={session.data?.user.name ?? "Account"}
                >
                   {session.data?.user.image ? (
                      <Image
@@ -128,16 +130,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
                         <Settings />
                      </span>
                   )}
-
-                  <span className="truncate">
-                     {session.data?.user.name ?? "Settings"}
-                  </span>
-                  {!pathname.includes(settingsPage) && (
-                     <span className="ml-auto">
-                        <ChevronRight />
-                     </span>
-                  )}
-               </Link>
+               </LinkItem>
             </div>
          </aside>
 
@@ -161,9 +154,10 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
                <Menu size={30} />
             </button>
             <p className="font-inter text-white-primary ml-3 text-xl font-medium">
-               {[...links, { route: settingsPage, label: "Settings" }].find(
-                  (e) => pathname.includes(e.route),
-               )?.label ?? ""}
+               {[
+                  ...links.flat(),
+                  { route: settingsPage, label: "Settings" },
+               ].find((e) => pathname.includes(e.route))?.label ?? ""}
             </p>
          </header>
 
