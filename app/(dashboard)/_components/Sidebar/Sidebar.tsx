@@ -70,7 +70,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
       <>
          <aside
             className={clsx(
-               "fixed z-100 flex h-dvh w-full flex-col overflow-auto bg-[#34A853] px-7 py-5 transition-[transform_shadow] select-none sm:w-80 sm:px-4 md:shadow-none",
+               "fixed z-100 flex h-dvh w-full flex-col overflow-auto bg-[#34A853] px-7 py-5 shadow-[0_100px_0_#34A853] transition-[transform_shadow] select-none sm:w-80 sm:px-4 md:shadow-none",
                sidebarSwitch.mobile
                   ? "translate-x-0 sm:shadow-[0_0_0_3000px_rgba(0,0,0,0.1)]"
                   : "-translate-x-full",
