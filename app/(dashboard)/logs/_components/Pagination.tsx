@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { LOGS_PAGE_SIZE } from "@/data-access-layer/borrowLogs";
+import Link from "next/link";
 
 export default function Pagination({
    page,
