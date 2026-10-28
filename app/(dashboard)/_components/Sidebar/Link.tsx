@@ -13,13 +13,16 @@ export default function LinkItem(
    const pathname = usePathname();
    const toggleMobileSidebar = useMobileSidebarToggle();
 
+   const isActive = pathname.includes(props.href.toString());
+
    return (
       <Link
+         inert={isActive}
          className={cn(
             "font-funnel-sans flex items-center gap-2 rounded-sm p-3 text-white/90 outline-0",
-            pathname.includes(props.href.toString())
+            isActive
                ? "bg-yellow-primary pointer-events-none text-gray-800 shadow-sm"
-               : "hover:bg-white-primary/15 hover:text-white hover:shadow-sm focus-visible:bg-white/8",
+               : "hover:bg-white/15 hover:text-white hover:shadow-sm focus-visible:bg-white/15 focus-visible:text-white focus-visible:shadow-sm",
          )}
          onClick={() => toggleMobileSidebar(false)}
          {...props}
