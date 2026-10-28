@@ -33,7 +33,7 @@ const PasswordInput = ({
          <label
             htmlFor={name}
             className={clsx(
-               "font-inter mt-2 mb-1 block text-sm font-light",
+               "mt-2 mb-1 block text-sm font-light",
                "text-white-primary",
             )}
          >
@@ -127,7 +127,7 @@ export default function ChangePassword({
          onSubmit={(e) => {
             if (isPending) e.preventDefault();
          }}
-         className="font-inter mt-10 font-medium"
+         className="mt-10 font-medium"
       >
          <input
             type="email"

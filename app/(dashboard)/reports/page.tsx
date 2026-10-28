@@ -134,7 +134,7 @@ export default async function ReportsPage({
 }) {
    return (
       <div className="p-4">
-         <h1 className="font-inter my-3 text-center text-xl font-bold uppercase">
+         <h1 className="my-3 text-center text-xl font-bold uppercase">
             {reportTitle}
          </h1>
          <Suspense fallback={<ReportSkeleton />}>

@@ -52,7 +52,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             geist.variable,
          )}
       >
-         <body className="font-inter flex min-h-full flex-col bg-[#f9fafb] select-none">
+         <body className="font-funnel-sans flex min-h-full flex-col bg-[#f9fafb] select-none">
             <SpeedInsights />
             <ToastContainer
                position="bottom-right"

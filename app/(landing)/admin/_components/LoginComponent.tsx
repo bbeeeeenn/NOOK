@@ -111,7 +111,7 @@ export default function Login() {
          </Link>
          <button
             disabled={isPending}
-            className="bg-green-primary from-white-primary/12 flex w-full items-center justify-center rounded-lg bg-linear-to-b to-transparent py-3 text-sm font-light outline-1 outline-[#375DFB]"
+            className="bg-green-primary from-white-primary/12 flex w-full items-center justify-center rounded-lg bg-linear-to-b to-transparent py-3 text-sm font-light shadow-[0_0_3px_rgba(255,255,255,0.3)]"
          >
             {isPending ? (
                <LoaderCircle className="animate-spin" size={20} />

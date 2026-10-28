@@ -84,10 +84,10 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
                className="text-white-primary absolute top-4 left-4 md:hidden"
                onClick={() => toggleMobileSidebar()}
             >
-               <X size={30} />
+               <X size={27} />
             </button>
             <Nook1 width={180} className="m-auto mt-15 mb-10 w-45" />
-            <div className="font-inter text-white-primary text-lg font-medium">
+            <div className="text-white-primary text-lg font-medium">
                {links.map((group, i) => (
                   <React.Fragment key={i}>
                      <div className="space-y-1">
@@ -112,7 +112,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
                   </React.Fragment>
                ))}
             </div>
-            <div className="font-inter text-white-primary mt-auto text-lg font-medium">
+            <div className="text-white-primary mt-auto text-lg font-medium">
                {/* the same as the previous div with `mt-auto` to separate them */}
                <LinkItem
                   href={settingsPage}
@@ -138,7 +138,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
          {/* Header */}
          <header
             className={clsx(
-               "bg-green-primary fixed inset-x-0 top-0 z-90 flex h-15 items-center px-4 shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition-[left] select-none",
+               "bg-green-primary fixed inset-x-0 top-0 z-90 flex h-15 items-center px-4 shadow-md transition-[left] select-none",
                sidebarSwitch.desktop && "md:left-81",
             )}
          >
@@ -146,15 +146,15 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
                className="text-white-primary hidden md:block"
                onClick={() => toggleDesktopSidebar()}
             >
-               <Menu size={30} />
+               <Menu size={27} />
             </button>
             <button
                className="text-white-primary md:hidden"
                onClick={() => toggleMobileSidebar()}
             >
-               <Menu size={30} />
+               <Menu size={27} />
             </button>
-            <p className="font-inter text-white-primary ml-3 text-xl font-medium">
+            <p className="text-white-primary ml-3 text-xl font-medium">
                {[
                   ...links.flat(),
                   { route: settingsPage, label: "Settings" },

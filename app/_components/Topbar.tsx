@@ -24,7 +24,7 @@ export default function Topbar() {
             >
                <Menu />
             </button>
-            <div className="font-inter hidden grow items-center justify-end gap-10 px-5 sm:flex">
+            <div className="hidden grow items-center justify-end gap-10 px-5 sm:flex">
                <Link
                   href={homePage}
                   className="w-19 text-center hover:font-bold hover:text-[#FBBC05]"
@@ -49,7 +49,7 @@ export default function Topbar() {
          {/* Mobile */}
          <div
             className={clsx(
-               "font-inter bg-white-primary fixed inset-x-0 top-14 overflow-y-hidden text-lg font-medium shadow-md transition-[height] duration-300 sm:hidden",
+               "bg-white-primary fixed inset-x-0 top-14 overflow-y-hidden text-lg font-medium shadow-md transition-[height] duration-300 sm:hidden",
                isOpen ? "h-39" : "h-0",
             )}
             onClick={() => setIsOpen(false)}

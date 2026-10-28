@@ -43,10 +43,7 @@ export default function ScannerPage() {
       <>
          <div className="mb-8 flex flex-wrap-reverse items-end justify-evenly gap-x-6 gap-y-8 pt-2">
             <form onSubmit={onSubmit} className="max-w-120 grow text-white">
-               <label
-                  htmlFor=""
-                  className="font-inter mb-2 block text-sm font-normal"
-               >
+               <label htmlFor="" className="mb-2 block text-sm font-normal">
                   Book Barcode
                </label>
                <input
@@ -65,7 +62,7 @@ export default function ScannerPage() {
                <label
                   htmlFor=""
                   className={clsx(
-                     "font-inter mb-2 block text-sm font-normal",
+                     "mb-2 block text-sm font-normal",
                      isVisitor && "opacity-50",
                   )}
                >

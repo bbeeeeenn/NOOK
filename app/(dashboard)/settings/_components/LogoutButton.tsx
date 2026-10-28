@@ -17,7 +17,7 @@ export default function LogoutButton() {
    return (
       <>
          <button
-            className="bg-yellow-primary font-inter outline-yellow-primary relative mt-10 flex h-12 w-full items-center gap-2 rounded-md p-3 font-semibold shadow-md outline-offset-2 focus-visible:outline-2 active:brightness-105 disabled:pointer-events-none disabled:opacity-80"
+            className="bg-yellow-primary  outline-yellow-primary relative mt-10 flex h-12 w-full items-center gap-2 rounded-md p-3 font-semibold shadow-md outline-offset-2 focus-visible:outline-2 active:brightness-105 disabled:pointer-events-none disabled:opacity-80"
             onClick={handleLogout}
             disabled={isSigningOut}
          >

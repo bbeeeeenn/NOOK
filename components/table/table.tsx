@@ -15,7 +15,7 @@ export default function Table({
    return (
       <table
          className={clsx(
-            "font-inter w-full border-separate border-spacing-0",
+            "w-full border-separate border-spacing-0",
             extraStyling,
          )}
       >
