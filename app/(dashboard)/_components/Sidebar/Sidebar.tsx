@@ -105,9 +105,10 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
                               ),
                         )}
                      </div>
-                     {i + 1 < links.length && (
-                        <div className="mx-auto my-3 h-px bg-white/30" />
-                     )}
+                     {i + 1 < links.length &&
+                        session.data?.user.userType === "Admin" && (
+                           <div className="mx-auto my-3 h-px bg-white/30" />
+                        )}
                   </React.Fragment>
                ))}
             </div>

@@ -16,7 +16,7 @@ export default function LinkItem(
    return (
       <Link
          className={cn(
-            "font-funnel-sans flex items-center gap-2 rounded-sm p-3 text-white/83 outline-0",
+            "font-funnel-sans flex items-center gap-2 rounded-sm p-3 text-white/90 outline-0",
             pathname.includes(props.href.toString())
                ? "bg-yellow-primary pointer-events-none text-gray-800 shadow-sm"
                : "hover:bg-white-primary/15 hover:text-white hover:shadow-sm focus-visible:bg-white/8",
