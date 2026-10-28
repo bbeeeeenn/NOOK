@@ -1,5 +1,5 @@
 "use client";
-import { adminLoginPage, homePage, privacyPolicyPage } from "@/constants";
+import { adminLoginPage, homePage } from "@/constants";
 import clsx from "clsx";
 import { ChevronRight, Menu } from "lucide-react";
 import Image from "next/image";
@@ -31,12 +31,12 @@ export default function Topbar() {
                >
                   Home
                </Link>
-               <Link
+               {/* <Link
                   href={privacyPolicyPage}
                   className="w-31 text-center hover:font-bold hover:text-[#FBBC05]"
                >
                   Privacy Policy
-               </Link>
+               </Link> */}
                <Link
                   href={adminLoginPage}
                   className="w-19 text-center hover:font-bold hover:text-[#FBBC05]"
@@ -63,7 +63,7 @@ export default function Topbar() {
                   <ChevronRight />
                </span>
             </Link>
-            <Link
+            {/* <Link
                href={privacyPolicyPage}
                className="relative block w-full py-3 text-center active:bg-gray-100"
             >
@@ -71,7 +71,7 @@ export default function Topbar() {
                <span className="absolute inset-y-0 right-4 flex items-center">
                   <ChevronRight />
                </span>
-            </Link>
+            </Link> */}
             <Link
                href={adminLoginPage}
                className="relative block w-full py-3 text-center active:bg-gray-100"
