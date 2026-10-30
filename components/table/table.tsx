@@ -25,7 +25,7 @@ export default function Table({
                   <th
                      key={i}
                      className={clsx(
-                        "border-b-green-primary border-b px-1.5 py-3",
+                        "border-b-green-primary py-2 pl-4 text-start uppercase",
                         i === 0 && "rounded-tl-md",
                         i === headers.length - 1 && "rounded-tr-md",
                      )}

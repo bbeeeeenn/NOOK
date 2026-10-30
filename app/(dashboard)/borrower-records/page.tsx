@@ -12,6 +12,7 @@ import FallbackRow from "@/components/table/fallbackRow";
 import { File } from "lucide-react";
 import Filter from "./_components/Filter";
 import Pagination from "./_components/Pagination";
+import getProgramsAndColleges from "@/data-access-layer/programsAndColleges";
 
 type SearchParameters = Promise<{
    idNumber?: string;
@@ -93,26 +94,44 @@ async function SuspendedPagination({
    );
 }
 
-async function SuspendedBorrowerRecords({
+async function SuspendedFilter({
    searchParams,
 }: {
    searchParams: SearchParameters;
 }) {
    const { idNumber, name, program, college, pageSize } = await searchParams;
 
+   const programsAndColleges = await getProgramsAndColleges();
+
+   if (!programsAndColleges.ok) return null;
+
+   return (
+      <Filter
+         key={JSON.stringify(await searchParams)}
+         programs={programsAndColleges.data.programs}
+         colleges={programsAndColleges.data.colleges}
+         idNumber={idNumber}
+         name={name}
+         program={program}
+         college={college}
+         pageSize={pageSize}
+      />
+   );
+}
+
+async function SuspendedBorrowerRecords({
+   searchParams,
+}: {
+   searchParams: SearchParameters;
+}) {
    return (
       <>
-         <Filter
-            key={JSON.stringify(await searchParams)}
-            idNumber={idNumber}
-            name={name}
-            program={program}
-            college={college}
-            pageSize={pageSize}
-         />
+         <Suspense>
+            <SuspendedFilter searchParams={searchParams} />
+         </Suspense>
          <div className="overflow-x-auto">
             <Table
-               headers={["ID", "Name", "Year", "College", "Program"]}
+               headers={["ID", "Name", "Year Level", "College", "Program"]}
                extraStyling="min-w-150"
             >
                <Suspense fallback={<FallbackRow />}>

@@ -4,21 +4,15 @@ import validateBorrowerImport, {
    type BorrowerImportValidationResult,
 } from "@/actions/BorrowerRecords/validateImport";
 import confirmBorrowerImport from "@/actions/BorrowerRecords/confirmImport";
-import type { BorrowerImportRow } from "@/lib/borrower-import";
+import {
+   BORROWER_IMPORT_HEADERS,
+   type BorrowerImportRow,
+} from "@/lib/borrower-import";
 import { ChevronRight, LoaderCircle, Upload } from "lucide-react";
 import * as XLSX from "xlsx";
 import { useActionState, useState } from "react";
 
-const headers = [
-   "idNumber",
-   "firstname",
-   "middlename",
-   "lastname",
-   "gender",
-   "college",
-   "program",
-   "yearLevel",
-] as const;
+const headers = BORROWER_IMPORT_HEADERS;
 
 function downloadTemplate() {
    const worksheet = XLSX.utils.aoa_to_sheet([

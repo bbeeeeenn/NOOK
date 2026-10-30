@@ -1,6 +1,5 @@
 "use client";
 
-import { programs, colleges } from "@/constants";
 import { Input } from "@/components/ui/input";
 import { usePathname, useRouter } from "next/navigation";
 import { SubmitEvent, useState, useTransition } from "react";
@@ -9,12 +8,16 @@ import clsx from "clsx";
 import { Button } from "@/components/ui/button";
 
 export default function Filter({
+   programs,
+   colleges,
    idNumber: initialIdNumber,
    name: initialName,
    program: initialProgram,
    college: initialCollege,
    pageSize: initialPageSize,
 }: {
+   programs: string[];
+   colleges: string[];
    idNumber?: string;
    name?: string;
    program?: string;
@@ -102,8 +105,8 @@ export default function Filter({
                >
                   <option value="">All programs</option>
                   {programs.map((item) => (
-                     <option key={item.progcode} value={item.progcode}>
-                        {item.progcode}
+                     <option key={item} value={item}>
+                        {item}
                      </option>
                   ))}
                </select>
@@ -116,13 +119,11 @@ export default function Filter({
                   className="border-input h-8 rounded-lg border bg-transparent px-2 text-sm select-none"
                >
                   <option value="">All colleges</option>
-                  {colleges
-                     .filter((item) => item.shorthand)
-                     .map((item) => (
-                        <option key={item.shorthand} value={item.shorthand}>
-                           {item.shorthand}
-                        </option>
-                     ))}
+                  {colleges.map((item) => (
+                     <option key={item} value={item}>
+                        {item}
+                     </option>
+                  ))}
                </select>
             </label>
             <label className="flex w-24 flex-col gap-1 text-xs">

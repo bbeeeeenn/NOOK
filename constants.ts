@@ -6,6 +6,7 @@ export const topBorrowersPage = "/logs/top-borrowers";
 export const borrowerRecordsPage = "/borrower-records";
 export const bookRecordsPage = "/book-records";
 export const importBorrowerRecordsPage = "/borrower-records/import";
+export const importBookRecordsPage = "/book-records/import";
 export const scannerPage = "/scanner";
 export const reportsPage = "/reports";
 export const settingsPage = "/settings";

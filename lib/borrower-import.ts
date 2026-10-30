@@ -45,14 +45,14 @@ function getCellValue(value: unknown): string {
    return String(value).trim();
 }
 
-function isExpectedHeaderRow(row: unknown[]): boolean {
-   return (
-      row.length === BORROWER_IMPORT_HEADERS.length &&
-      BORROWER_IMPORT_HEADERS.every(
-         (header, index) => getCellValue(row[index]) === header,
-      )
-   );
-}
+// function isExpectedHeaderRow(row: unknown[]): boolean {
+//    return (
+//       row.length === BORROWER_IMPORT_HEADERS.length &&
+//       BORROWER_IMPORT_HEADERS.every(
+//          (header, index) => getCellValue(row[index]) === header,
+//       )
+//    );
+// }
 
 function parseYearLevel(value: string): number | null {
    if (!/^[1-6]$/.test(value)) return null;
@@ -116,14 +116,14 @@ export function validateBorrowerWorkbook(
    }
 
    const errors: BorrowerImportError[] = [];
-   const headerRow = matrix[0] ?? [];
+   // const headerRow = matrix[0] ?? [];
 
-   if (!isExpectedHeaderRow(headerRow)) {
-      errors.push({
-         row: 1,
-         message: `Headers must be exactly: ${BORROWER_IMPORT_HEADERS.join(", ")}`,
-      });
-   }
+   // if (!isExpectedHeaderRow(headerRow)) {
+   //    errors.push({
+   //       row: 1,
+   //       message: `Headers must be exactly: ${BORROWER_IMPORT_HEADERS.join(", ")}`,
+   //    });
+   // }
 
    const dataRows = matrix.slice(1);
    const totalRows = dataRows.length;

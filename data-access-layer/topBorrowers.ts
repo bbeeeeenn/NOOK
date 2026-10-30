@@ -42,7 +42,7 @@ async function getCachedTopBorrowers(
    page = 1,
    pageSize = 20,
 ) {
-   "use cache";
+   "use cache: remote";
    cacheLife("days");
    const where = { ...(from || to ? { date: { gte: from, lte: to } } : {}) };
    return await prisma.borrowLog.groupBy({
