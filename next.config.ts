@@ -3,6 +3,11 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
    allowedDevOrigins: ["shawlless-unregaled-benton.ngrok-free.dev"],
    cacheComponents: true,
+   experimental: {
+      serverActions: {
+         bodySizeLimit: "10mb",
+      },
+   },
    images: {
       remotePatterns: [
          {

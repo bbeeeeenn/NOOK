@@ -12,13 +12,13 @@ export default function TableRow({
    return (
       <tr
          className={clsx(
-            "bg-gray-50 text-center hover:bg-blue-50",
+            "bg-gray-50 hover:bg-blue-50",
             index % 2 === 0 && "bg-gray-100",
             styles,
          )}
       >
          {data.map((d, i) => (
-            <td key={i} className="p-2">
+            <td key={i} className="py-2 pl-4">
                {d}
             </td>
          ))}

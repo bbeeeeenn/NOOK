@@ -24,7 +24,7 @@ model BorrowLog {
   bookBarcode String
 
   borrower BorrowerRecord? @relation(fields: [idNumber], references: [idNumber])
-  book BookRecord @relation(fields: [bookBarcode], references: [copyCode])
+  book     BookRecord      @relation(fields: [bookBarcode], references: [copyCode])
 
   @@index([date])
   @@index([type])
@@ -32,11 +32,11 @@ model BorrowLog {
 }
 
 model BookRecord {
-  copyCode String @id
-  callnumber String
-  title String
-  author String
-  sublocation String
+  copyCode        String @id
+  callnumber      String
+  title           String
+  author          String
+  sublocation     String
   circulationType String
 
   borrowLog BorrowLog[]
@@ -48,7 +48,7 @@ enum Gender {
 }
 
 model BorrowerRecord {
-  idNumber   String   @id
+  idNumber   String  @id
   firstname  String
   lastname   String
   middlename String?
@@ -68,23 +68,25 @@ model User {
   image         String?
   password      String?
 
-  accounts      Account[]
-  sessions      Session[]
-  borrowerImports BorrowerImport[]
-  importAudits   BorrowerImportAudit[]
+  accounts         Account[]
+  sessions         Session[]
+  borrowerImports  BorrowerImport[]
+  importAudits     BorrowerImportAudit[]
+  bookImports      BookImport[]
+  bookImportAudits BookImportAudit[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model BorrowerImport {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   filename    String
   rows        Json
   totalRows   Int
   insertCount Int
   updateCount Int
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
   expiresAt   DateTime
   consumedAt  DateTime?
   createdById String
@@ -95,6 +97,39 @@ model BorrowerImport {
 }
 
 model BorrowerImportAudit {
+  id          String   @id @default(cuid())
+  filename    String
+  totalRows   Int
+  insertCount Int
+  updateCount Int
+  status      String
+  details     String?
+  createdAt   DateTime @default(now())
+  createdById String
+
+  createdBy User @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([createdById, createdAt])
+}
+
+model BookImport {
+  id          String    @id @default(cuid())
+  filename    String
+  rows        Json
+  totalRows   Int
+  insertCount Int
+  updateCount Int
+  createdAt   DateTime  @default(now())
+  expiresAt   DateTime
+  consumedAt  DateTime?
+  createdById String
+
+  createdBy User @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([createdById, expiresAt])
+}
+
+model BookImportAudit {
   id          String   @id @default(cuid())
   filename    String
   totalRows   Int
