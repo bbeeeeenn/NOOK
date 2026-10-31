@@ -23,7 +23,7 @@ type SearchParameters = Promise<{
 }>;
 
 const headers = [
-   "Copy Code",
+   "Code",
    "Call Number",
    "Title",
    "Author",

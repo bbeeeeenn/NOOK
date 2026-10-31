@@ -82,18 +82,18 @@ export function validateBookWorkbook(
    }
 
    const errors: BookImportError[] = [];
-   // const headerRow = matrix[0] ?? [];
-   // if (
-   //    headerRow.length !== BOOK_IMPORT_HEADERS.length ||
-   //    BOOK_IMPORT_HEADERS.some(
-   //       (header, index) => getCellValue(headerRow[index]) !== header,
-   //    )
-   // ) {
-   //    errors.push({
-   //       row: 1,
-   //       message: `Headers must be exactly: ${BOOK_IMPORT_HEADERS.join(", ")}`,
-   //    });
-   // }
+   const headerRow = matrix[0] ?? [];
+   if (
+      headerRow.length !== BOOK_IMPORT_HEADERS.length ||
+      BOOK_IMPORT_HEADERS.some(
+         (header, index) => getCellValue(headerRow[index]) !== header,
+      )
+   ) {
+      errors.push({
+         row: 1,
+         message: `Headers must be exactly: ${BOOK_IMPORT_HEADERS.join(", ")}`,
+      });
+   }
 
    const dataRows = matrix.slice(1);
    const totalRows = dataRows.length;
