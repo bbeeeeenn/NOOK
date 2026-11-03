@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
    req: NextRequest,
-): Promise<NextResponse<Result<{ title: string; authors: string }>>> {
+): Promise<NextResponse<Result<{ title: string; author: string }>>> {
    const bookCode = req.nextUrl.searchParams.get("code")?.trim();
    if (!bookCode)
       return NextResponse.json(
@@ -36,14 +36,14 @@ export async function GET(
             {
                ok: false,
                error: "NOT_FOUND",
-               message: "Not found",
+               message: "Book record not found",
             },
             { status: 404 },
          );
 
       return NextResponse.json({
          ok: true,
-         data: { title: data.title, authors: data.author },
+         data: { title: data.title, author: data.author },
       });
    } catch (e) {
       console.error(e);
@@ -61,7 +61,7 @@ export async function GET(
 async function getBook(bookCode: string) {
    "use cache: remote";
    cacheLife("days");
-   cacheTag(`book:${bookCode}`);
+   cacheTag(`books`);
 
    return prisma.bookRecord.findUnique({
       where: { copyCode: bookCode },
@@ -69,6 +69,6 @@ async function getBook(bookCode: string) {
    });
 }
 
-export function updateBookCache(bookCode: string) {
-   updateTag(`book:${bookCode}`);
+export function updateBooksCache() {
+   updateTag(`books`);
 }

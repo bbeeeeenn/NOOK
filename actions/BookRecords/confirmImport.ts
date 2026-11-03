@@ -4,6 +4,7 @@
 
 "use server";
 
+import { updateBooksCache } from "@/app/api/book/route";
 import { bookRecordsPage, importBookRecordsPage } from "@/constants";
 import { Prisma } from "@/generated/prisma/client";
 import { auth } from "@/lib/auth/auth";
@@ -157,6 +158,7 @@ export default async function confirmBookImport(
 
       revalidatePath(bookRecordsPage);
       revalidatePath(importBookRecordsPage);
+      updateBooksCache();
       return {
          ok: true,
          data: {

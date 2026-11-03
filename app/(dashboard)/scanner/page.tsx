@@ -132,6 +132,34 @@ export default function ScannerPage() {
    );
 }
 
+function useFetch<T>(apiUrl: string): [T | null, string] {
+   const [data, setData] = useState<T | null>(null);
+   const [error, setError] = useState("");
+   useEffect(() => {
+      const controller = new AbortController();
+
+      (async () => {
+         try {
+            const res = await fetch(apiUrl, {
+               signal: controller.signal,
+            });
+            const fetchedData = (await res.json()) as Result<T>;
+            if (fetchedData.ok) setData(fetchedData.data);
+            else setError(fetchedData.message);
+         } catch (e) {
+            if (e instanceof DOMException && e.name === "AbortError") {
+               return;
+            }
+            console.error(e);
+            setError("Unexpected error. Please try again.");
+         }
+      })();
+
+      return () => controller.abort();
+   }, [apiUrl]);
+   return [data, error];
+}
+
 function ConfirmationCard({
    idNumber,
    bookBarcode,
@@ -143,48 +171,16 @@ function ConfirmationCard({
    isVisitor: boolean;
    close: () => void;
 }) {
-   const [borrower, setBorrower] = useState<BorrowerRecordGetPayload<{
-      omit: { gender: true; idNumber: true };
-   }> | null>(null);
-   const [book, setBook] = useState<BookRecordGetPayload<{
-      select: { title: true; author: true };
-   }> | null>(null);
-   const [error, setError] = useState({ borrower: "", book: "" });
-
-   useEffect(() => {
-      const controller = new AbortController();
-
-      // Fetch borrower info
-      (async () => {
-         if (isVisitor) return;
-         try {
-            const res = await fetch(`/api/borrower?idNumber=${idNumber}`, {
-               signal: controller.signal,
-            });
-            const borrowerInfo = (await res.json()) as Result<
-               BorrowerRecordGetPayload<{
-                  omit: { gender: true; idNumber: true };
-               }>
-            >;
-            if (borrowerInfo.ok) setBorrower(borrowerInfo.data);
-            else
-               setError((prev) => ({
-                  ...prev,
-                  borrower: borrowerInfo.message,
-               }));
-         } catch (e) {
-            if (e instanceof Error) {
-               console.error(e);
-               setError((prev) => ({
-                  ...prev,
-                  borrower: "Unexpected error. Please try again.",
-               }));
-            }
-         }
-      })();
-
-      return () => controller.abort("Aborted");
-   }, [idNumber, bookBarcode, isVisitor]);
+   const [borrower, borrowerError] = useFetch<
+      BorrowerRecordGetPayload<{
+         omit: { gender: true; idNumber: true };
+      }>
+   >(`/api/borrower?idNumber=${idNumber}`);
+   const [book, bookerror] = useFetch<
+      BookRecordGetPayload<{
+         select: { title: true; author: true };
+      }>
+   >(`/api/book?code=${bookBarcode}`);
 
    return (
       <div className="bg-green-primary borrowconfirmationcard text-white-primary font-roboto mx-auto min-h-40 rounded-md border border-green-400 p-4">
@@ -204,13 +200,13 @@ function ConfirmationCard({
                </p>
             </div>
             {!isVisitor &&
-               (error.borrower ? (
+               (borrowerError ? (
                   <div className="py-2">
                      <p className="flex items-center gap-2 bg-green-700/50 p-1">
                         <span>
                            <AlertCircle size={20} />
                         </span>
-                        {error.borrower}
+                        {borrowerError}
                      </p>
                   </div>
                ) : !borrower ? (
@@ -254,10 +250,28 @@ function ConfirmationCard({
                </div>
                <p className="truncate font-semibold">{bookBarcode}</p>
             </div>
-            <div className="py-2">
-               <p className="text-lg">Noli Me Tangere</p>
-               <p className="text-sm">by Jose Rizal</p>
-            </div>
+            {bookerror ? (
+               <div className="py-2">
+                  <p className="flex items-center gap-2 bg-green-700/50 p-1">
+                     <span>
+                        <AlertCircle size={20} />
+                     </span>
+                     {bookerror}
+                  </p>
+               </div>
+            ) : !book ? (
+               <div className="flex items-center gap-2 py-4">
+                  <span>
+                     <LoaderCircle className="animate-spin" size={20} />
+                  </span>
+                  Loading...
+               </div>
+            ) : (
+               <div className="py-2">
+                  <p className="text-lg">{book?.title}</p>
+                  <p className="text-sm">by {book?.author}</p>
+               </div>
+            )}
          </div>
 
          <div className="flex gap-x-4 font-semibold text-black">
