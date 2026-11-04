@@ -1,7 +1,6 @@
 "use server";
 
 import { logsPage } from "@/constants";
-import { PatronType } from "@/generated/prisma/enums";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 import { Result } from "@/types/types";
@@ -10,7 +9,6 @@ import { revalidatePath } from "next/cache";
 
 export default async function createBorrowLog(
    bookBarcode: string,
-   type: PatronType,
    scannedId?: string,
 ): Promise<Result<{ message: string }>> {
    const session = await auth();
@@ -50,7 +48,6 @@ export default async function createBorrowLog(
             bookBarcode: normalizedBookBarcode,
             scannedId: normalizedScannedId,
             idNumber: existingBorrower?.idNumber,
-            type,
          },
       });
 

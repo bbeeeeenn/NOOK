@@ -51,14 +51,16 @@ async function Suspended({ searchParams }: { searchParams: SearchParameters }) {
          index={i}
          data={[
             toPHDateString(row.date),
-            row.idNumber,
-            row.borrower?.firstname,
-            row.borrower?.program,
-            row.borrower?.yearLevel,
-            row.borrower?.college,
             row.bookBarcode,
-            // row.bookTitle,
-            // row.bookAuthor,
+            row.scannedId || "VISITOR",
+            row.scannedId
+               ? row.borrower
+                  ? `${row.borrower.firstname} ${row.borrower.middlename ? row.borrower.middlename + " " : ""}${row.borrower.lastname}`
+                  : "[?]"
+               : "VISITOR",
+            row.scannedId ? (row.borrower?.program ?? "[?]") : "VISITOR",
+            row.scannedId ? (row.borrower?.yearLevel ?? "[?]") : "VISITOR",
+            row.scannedId ? (row.borrower?.college ?? "[?]") : "VISITOR",
          ]}
       />
    ));
@@ -118,14 +120,12 @@ export default async function Logs({
             <Table
                headers={[
                   "Date",
-                  "ID",
+                  "Book Barcode",
+                  "ID-NUMBER",
                   "Name",
                   "Program",
                   "Year",
                   "College",
-                  "Book Barcode",
-                  // "Title",
-                  // "Author",
                ]}
                extraStyling="min-w-230"
             >

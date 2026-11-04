@@ -7,17 +7,9 @@ datasource db {
   provider = "postgresql"
 }
 
-enum PatronType {
-  Visitor
-  Student
-  Faculty
-  Graduate
-}
-
 model BorrowLog {
   id String @id @default(cuid())
 
-  type        PatronType
   date        DateTime   @default(now())
   scannedId   String?
   idNumber    String?
@@ -27,7 +19,6 @@ model BorrowLog {
   book     BookRecord      @relation(fields: [bookBarcode], references: [copyCode])
 
   @@index([date])
-  @@index([type])
   @@index([idNumber, date])
 }
 

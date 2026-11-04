@@ -1,4 +1,5 @@
 "use client";
+import createBorrowLog from "@/actions/BorrowLogs/createBorrowLog";
 import {
    BookRecordGetPayload,
    BorrowerRecordGetPayload,
@@ -9,23 +10,27 @@ import clsx from "clsx";
 import {
    AlertCircle,
    Barcode,
+   Check,
    CheckSquare,
    LoaderCircle,
    Square,
    User,
 } from "lucide-react";
 import { SubmitEvent, useEffect, useRef, useState } from "react";
+import { toast } from "react-toastify";
 
 export default function ScannerPage() {
    const [inputs, setInputs] = useState<{
       bookBarcode: string;
-      idNumber: string | null;
+      idNumber: string;
    }>({ bookBarcode: "", idNumber: "" });
    const [isVisitor, setIsVisitor] = useState(false);
 
+   const [isLogging, setIsLogging] = useState(false);
+
    const [confirmation, setConfirmation] = useState<{
       bookBarcode: string;
-      idNumber: string | null;
+      idNumber?: string;
       isVisitor: boolean;
    } | null>(null);
 
@@ -37,6 +42,31 @@ export default function ScannerPage() {
       requestAnimationFrame(() => {
          confirmationCardRef.current?.scrollIntoView({ behavior: "smooth" });
       });
+   };
+
+   const onConfirm = async () => {
+      if (!confirmation?.bookBarcode) return;
+      setIsLogging(true);
+      const loadingToast = toast.loading("Processing...");
+      const res = await createBorrowLog(
+         confirmation.bookBarcode,
+         confirmation.idNumber,
+      );
+      toast.update(loadingToast, {
+         type: res.ok ? "success" : "error",
+         isLoading: false,
+         autoClose: 5000,
+         render: res.ok ? res.data.message : res.message,
+      });
+      if (res.ok) {
+         setInputs({ bookBarcode: "", idNumber: "" });
+         setConfirmation(null);
+      }
+      setIsLogging(false);
+   };
+
+   const handleModalClose = () => {
+      if (!isLogging) setConfirmation(null);
    };
 
    return (
@@ -124,7 +154,8 @@ export default function ScannerPage() {
                   idNumber={confirmation.idNumber}
                   bookBarcode={confirmation.bookBarcode}
                   isVisitor={confirmation.isVisitor}
-                  close={() => setConfirmation(null)}
+                  close={handleModalClose}
+                  confirm={onConfirm}
                />
             )}
          </div>
@@ -165,11 +196,13 @@ function ConfirmationCard({
    bookBarcode,
    isVisitor,
    close,
+   confirm,
 }: {
-   idNumber: string | null;
+   idNumber?: string;
    bookBarcode: string;
    isVisitor: boolean;
    close: () => void;
+   confirm: () => Promise<void>;
 }) {
    const [borrower, borrowerError] = useFetch<
       BorrowerRecordGetPayload<{
@@ -182,8 +215,21 @@ function ConfirmationCard({
       }>
    >(`/api/book?code=${bookBarcode}`);
 
+   const [isPending, setIsPending] = useState(false);
+
+   const handleConfirm = async () => {
+      setIsPending(true);
+      await confirm();
+      setIsPending(false);
+   };
+
    return (
-      <div className="bg-green-primary borrowconfirmationcard text-white-primary font-roboto mx-auto min-h-40 rounded-md border border-green-400 p-4">
+      <div
+         className={clsx(
+            "bg-green-primary borrowconfirmationcard text-white-primary font-roboto mx-auto min-h-40 rounded-md border border-green-400 p-4",
+            isPending && "opacity-85!",
+         )}
+      >
          <p className="text-xs opacity-90 sm:text-sm">Confirm details</p>
          <p className="text-lg font-semibold sm:text-xl">Borrow request</p>
 
@@ -274,16 +320,32 @@ function ConfirmationCard({
             )}
          </div>
 
-         <div className="flex gap-x-4 font-semibold text-black">
+         <div className="flex gap-x-2 font-semibold text-black sm:gap-x-4">
             <button
-               className="bg-yellow-primary rounded-sm px-6 py-2"
+               className="bg-yellow-primary grow rounded-sm px-8 py-2 shadow-sm"
                onClick={close}
             >
-               Cancel
+               Close
             </button>
-            <button className="bg-yellow-primary grow rounded-sm px-4 py-2">
-               Confirm
-            </button>
+            {book && (
+               <button
+                  onClick={handleConfirm}
+                  className="bg-yellow-primary flex w-full grow items-center justify-center gap-x-1 rounded-sm px-4 py-2 shadow-sm"
+               >
+                  {isPending ? (
+                     <span>
+                        <LoaderCircle size={20} className="animate-spin" />
+                     </span>
+                  ) : (
+                     <>
+                        <span>
+                           <Check size={20} />
+                        </span>
+                        Confirm
+                     </>
+                  )}
+               </button>
+            )}
          </div>
       </div>
    );
