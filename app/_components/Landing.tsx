@@ -1,33 +1,30 @@
-import getTopBorrowers from "@/data-access-layer/topBorrowers";
 import { Nook2 } from "../../components/Images";
-import TopBorrowerTable from "./TopBorrowerTable";
-import { Suspense } from "react";
 //  https://herolearningcommons.vercel.app/
 
-async function SuspendedTopBorrowerTable() {
-   const top = await getTopBorrowers();
-   if (!top.ok) {
-      return <>Error</>;
-   }
-   return <TopBorrowerTable topBorrowers={top.data} />;
-}
+// async function SuspendedTopBorrowerTable() {
+//    const top = await getTopBorrowers();
+//    if (!top.ok) {
+//       return <>Error</>;
+//    }
+//    return <TopBorrowerTable topBorrowers={top.data} />;
+// }
 
-function TopBorrowers() {
-   return (
-      <div className="flex flex-col px-4 sm:px-10">
-         <p className="border-yellow-primary mb-2 border-l-8 px-2 text-xl font-bold">
-            Top Borrowers
-         </p>
-         {/* <div className="h-5 bg-[#34A853]/12"></div> */}
-         <div className="bg-white-primary h-4 space-x-2 p-2 px-6"></div>
-         <div className="grow bg-[#34A853]/12">
-            <Suspense>
-               <SuspendedTopBorrowerTable />
-            </Suspense>
-         </div>
-      </div>
-   );
-}
+// function TopBorrowers() {
+//    return (
+//       <div className="flex flex-col px-4 sm:px-10">
+//          <p className="border-yellow-primary mb-2 border-l-8 px-2 text-xl font-bold">
+//             Top Borrowers
+//          </p>
+//          {/* <div className="h-5 bg-[#34A853]/12"></div> */}
+//          <div className="bg-white-primary h-4 space-x-2 p-2 px-6"></div>
+//          <div className="grow bg-[#34A853]/12">
+//             <Suspense>
+//                <SuspendedTopBorrowerTable />
+//             </Suspense>
+//          </div>
+//       </div>
+//    );
+// }
 
 export default function Landing() {
    return (
@@ -49,7 +46,7 @@ export default function Landing() {
                while reducing manual logging.
             </p>
          </div>
-         <TopBorrowers />
+         {/* <TopBorrowers /> */}
       </div>
    );
 }
