@@ -2,6 +2,7 @@ export const homePage = "/";
 export const privacyPolicyPage = "/privacy-policy";
 export const adminLoginPage = "/admin";
 export const logsPage = "/logs";
+export const allLogsPage = "/logs/all";
 export const topBorrowersPage = "/logs/top-borrowers";
 export const borrowerRecordsPage = "/borrower-records";
 export const bookRecordsPage = "/book-records";

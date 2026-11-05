@@ -22,7 +22,7 @@ export function Pill({
             active && "bg-yellow-primary pointer-events-none shadow-sm",
          )}
       >
-         {label} {children}
+         <span className="truncate">{label}</span> {children}
       </Link>
    );
 }

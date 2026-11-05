@@ -3,6 +3,7 @@ import { BorrowLogGetPayload } from "@/generated/prisma/models";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 import { Result } from "@/types/types";
+import { cacheLife } from "next/cache";
 
 export const LOGS_PAGE_SIZE = 20;
 
@@ -15,7 +16,7 @@ export type PaginatedBorrowLogs = {
    total: number;
 };
 
-export default async function getLogsWithBorrower(
+export default async function getLogs(
    idNumber?: string,
    from?: Date,
    to?: Date,
@@ -28,7 +29,7 @@ export default async function getLogsWithBorrower(
    }
 
    try {
-      const logsWithBorrower = await getCachedLogsWithBorrower(
+      const logsWithBorrower = await getCachedLogs(
          page,
          pageSize,
          idNumber,
@@ -49,15 +50,15 @@ export default async function getLogsWithBorrower(
    }
 }
 
-async function getCachedLogsWithBorrower(
+async function getCachedLogs(
    page: number,
    pageSize: number,
    idNumber?: string,
    from?: Date,
    to?: Date,
 ): Promise<PaginatedBorrowLogs> {
-   // "use cache";
-   // cacheLife("days");
+   "use cache: remote";
+   cacheLife("days");
 
    const where = {
       idNumber,
