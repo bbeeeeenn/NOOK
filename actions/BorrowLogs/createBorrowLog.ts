@@ -1,6 +1,6 @@
 "use server";
 
-import { logsPage } from "@/constants";
+import { allLogsPage, logsPage } from "@/constants";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 import { Result } from "@/types/types";
@@ -52,6 +52,7 @@ export default async function createBorrowLog(
       });
 
       revalidatePath(logsPage);
+      revalidatePath(allLogsPage);
 
       return {
          ok: true,

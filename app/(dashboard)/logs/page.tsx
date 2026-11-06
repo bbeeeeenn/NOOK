@@ -77,11 +77,7 @@ async function ComponentGenerator(
    ];
 }
 
-async function _Suspended({
-   searchParams,
-}: {
-   searchParams: SearchParameters;
-}) {
+async function Suspended({ searchParams }: { searchParams: SearchParameters }) {
    const components = await ComponentGenerator(searchParams);
 
    return (
@@ -113,31 +109,27 @@ export default async function Logs({
    searchParams: SearchParameters;
 }) {
    return (
-      <>
-         <Suspense
-            fallback={
-               <>
-                  <div className="overflow-x-auto">
-                     <Table
-                        headers={[
-                           "Date",
-                           "Book Barcode",
-                           "ID-NUMBER",
-                           "Name",
-                           "Program",
-                           "Year",
-                           "College",
-                        ]}
-                        extraStyling="min-w-230"
-                     >
-                        <FallbackRow />
-                     </Table>
-                  </div>
-               </>
-            }
-         >
-            <_Suspended searchParams={searchParams} />
-         </Suspense>
-      </>
+      <Suspense
+         fallback={
+            <div className="overflow-x-auto">
+               <Table
+                  headers={[
+                     "Date",
+                     "Book Barcode",
+                     "ID-NUMBER",
+                     "Name",
+                     "Program",
+                     "Year",
+                     "College",
+                  ]}
+                  extraStyling="min-w-230"
+               >
+                  <FallbackRow />
+               </Table>
+            </div>
+         }
+      >
+         <Suspended searchParams={searchParams} />
+      </Suspense>
    );
 }
