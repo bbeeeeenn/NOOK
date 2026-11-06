@@ -1,8 +1,5 @@
-import {
-   BORROWERS_PAGE_SIZE,
-   getBorrowerRecords,
-} from "@/data-access-layer/borrowerRecords";
-import { adminLoginPage } from "@/constants";
+import { getBorrowerRecords } from "@/data-access-layer/borrowerRecords";
+import { adminLoginPage, PAGE_SIZE } from "@/constants";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { DialogProvider } from "./_components/DialogProvider";
@@ -28,8 +25,8 @@ async function Suspended({ searchParams }: { searchParams: SearchParameters }) {
       await searchParams;
    const currentPage = Math.max(1, Number.parseInt(page ?? "1", 10) || 1);
    const currentPageSize = pageSize
-      ? Math.max(1, Number.parseInt(pageSize, 10) || BORROWERS_PAGE_SIZE)
-      : BORROWERS_PAGE_SIZE;
+      ? Math.max(1, Number.parseInt(pageSize, 10) || PAGE_SIZE)
+      : PAGE_SIZE;
    const res = await getBorrowerRecords(
       idNumber,
       name,
@@ -72,8 +69,8 @@ async function SuspendedPagination({
       await searchParams;
    const currentPage = Math.max(1, Number.parseInt(page ?? "1", 10) || 1);
    const currentPageSize = pageSize
-      ? Math.max(1, Number.parseInt(pageSize, 10) || BORROWERS_PAGE_SIZE)
-      : BORROWERS_PAGE_SIZE;
+      ? Math.max(1, Number.parseInt(pageSize, 10) || PAGE_SIZE)
+      : PAGE_SIZE;
    const res = await getBorrowerRecords(
       idNumber,
       name,

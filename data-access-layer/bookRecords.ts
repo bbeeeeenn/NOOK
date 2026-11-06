@@ -4,10 +4,8 @@ import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 import { cacheLife } from "next/cache";
 import { redirect } from "next/navigation";
-import { logsPage } from "@/constants";
+import { logsPage, PAGE_SIZE } from "@/constants";
 import type { Result } from "@/types/types";
-
-export const BOOKS_PAGE_SIZE = 20;
 
 type PaginatedBooks = {
    books: BookRecordModel[];
@@ -22,7 +20,7 @@ export async function getBookRecords(
    sublocation?: string,
    circulationType?: string,
    page = 1,
-   pageSize = BOOKS_PAGE_SIZE,
+   pageSize = PAGE_SIZE,
 ): Promise<Result<PaginatedBooks>> {
    const session = await auth();
    if (!session?.user) {
@@ -65,7 +63,7 @@ async function getCachedBookRecords(
    sublocation?: string,
    circulationType?: string,
    page = 1,
-   pageSize = BOOKS_PAGE_SIZE,
+   pageSize = PAGE_SIZE,
 ): Promise<PaginatedBooks> {
    "use cache: remote";
    cacheLife("days");

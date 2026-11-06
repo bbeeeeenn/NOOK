@@ -1,11 +1,10 @@
+import { PAGE_SIZE } from "@/constants";
 import { Prisma } from "@/generated/prisma/client";
 import { BorrowLogGetPayload } from "@/generated/prisma/models";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 import { Result } from "@/types/types";
 import { cacheLife } from "next/cache";
-
-export const LOGS_PAGE_SIZE = 20;
 
 type BorrowLog = BorrowLogGetPayload<{
    include: { borrower: true };
@@ -21,7 +20,7 @@ export default async function getLogs(
    from?: Date,
    to?: Date,
    page = 1,
-   pageSize = LOGS_PAGE_SIZE,
+   pageSize = PAGE_SIZE,
 ): Promise<Result<PaginatedBorrowLogs>> {
    const session = await auth();
    if (!session?.user) {

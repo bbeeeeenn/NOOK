@@ -1,8 +1,5 @@
-import {
-   getBookRecords,
-   BOOKS_PAGE_SIZE,
-} from "@/data-access-layer/bookRecords";
-import { adminLoginPage } from "@/constants";
+import { getBookRecords } from "@/data-access-layer/bookRecords";
+import { adminLoginPage, PAGE_SIZE } from "@/constants";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import Table from "@/components/table/table";
@@ -61,8 +58,8 @@ async function SuspendedRows({
    } = await searchParams;
    const currentPage = Math.max(1, Number.parseInt(page ?? "1", 10) || 1);
    const currentPageSize = pageSize
-      ? Math.max(1, Number.parseInt(pageSize, 10) || BOOKS_PAGE_SIZE)
-      : BOOKS_PAGE_SIZE;
+      ? Math.max(1, Number.parseInt(pageSize, 10) || PAGE_SIZE)
+      : PAGE_SIZE;
    const result = await getBookRecords(
       copyCode,
       callnumber,
@@ -123,8 +120,8 @@ async function SuspendedPagination({
    } = await searchParams;
    const currentPage = Math.max(1, Number.parseInt(page ?? "1", 10) || 1);
    const currentPageSize = pageSize
-      ? Math.max(1, Number.parseInt(pageSize, 10) || BOOKS_PAGE_SIZE)
-      : BOOKS_PAGE_SIZE;
+      ? Math.max(1, Number.parseInt(pageSize, 10) || PAGE_SIZE)
+      : PAGE_SIZE;
    const result = await getBookRecords(
       copyCode,
       callnumber,

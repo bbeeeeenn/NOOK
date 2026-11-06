@@ -5,9 +5,7 @@ import { cacheLife } from "next/cache";
 import type { Result } from "@/types/types";
 import { BorrowerRecordModel } from "@/generated/prisma/models";
 import { redirect } from "next/navigation";
-import { logsPage } from "@/constants";
-
-export const BORROWERS_PAGE_SIZE = 20;
+import { logsPage, PAGE_SIZE } from "@/constants";
 
 type PaginatedBorrowers = {
    borrowers: BorrowerRecordModel[];
@@ -20,7 +18,7 @@ export async function getBorrowerRecords(
    program?: string,
    college?: string,
    page = 1,
-   pageSize = BORROWERS_PAGE_SIZE,
+   pageSize = PAGE_SIZE,
 ): Promise<Result<PaginatedBorrowers>> {
    const session = await auth();
    if (!session?.user) {
@@ -59,7 +57,7 @@ async function getCachedBorrowerRecords(
    program?: string,
    college?: string,
    page = 1,
-   pageSize = BORROWERS_PAGE_SIZE,
+   pageSize = PAGE_SIZE,
 ): Promise<PaginatedBorrowers> {
    "use cache: remote";
    cacheLife("days");

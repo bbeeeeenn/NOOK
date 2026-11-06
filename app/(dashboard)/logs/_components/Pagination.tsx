@@ -1,5 +1,5 @@
 "use client";
-import { TABLE_PAGE_SIZE } from "@/constants";
+import { PAGE_SIZE } from "@/constants";
 import clsx from "clsx";
 import { usePathname, useRouter } from "next/navigation";
 import { useTransition } from "react";
@@ -16,7 +16,7 @@ export default function Pagination({
    const router = useRouter();
    const pathname = usePathname();
    const [isNavigating, startTransition] = useTransition();
-   const totalPages = Math.ceil(total / TABLE_PAGE_SIZE);
+   const totalPages = Math.ceil(total / PAGE_SIZE);
    if (totalPages <= 1) return null;
 
    const onChangePage = (page: number) => {

@@ -12,7 +12,7 @@ export const scannerPage = "/scanner";
 export const reportsPage = "/reports";
 export const settingsPage = "/settings";
 
-export const TABLE_PAGE_SIZE = 20;
+export const PAGE_SIZE = 20;
 
 export const programs = [
    {
