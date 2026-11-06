@@ -19,13 +19,13 @@ export default function Table({
             extraStyling,
          )}
       >
-         <thead className="bg-[#E8F5E9] text-sm font-bold select-none">
+         <thead className="bg-[#E8F5E9] text-xs font-bold select-none">
             <tr className="text-black/70">
                {headers.map((h, i) => (
                   <th
                      key={i}
                      className={clsx(
-                        "border-b-green-primary py-2 pl-4 text-start uppercase",
+                        "border-b-green-primary py-2.5 pl-4 text-start uppercase",
                         i === 0 && "rounded-tl-md",
                         i === headers.length - 1 && "rounded-tr-md",
                      )}

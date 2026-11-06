@@ -32,7 +32,7 @@ export default function Pagination({
 
    return (
       <nav
-         className="mt-3 mb-4 flex items-center justify-between gap-3"
+         className="mt-3 flex items-center justify-between gap-3"
          aria-label="Borrower pages"
       >
          <Link
