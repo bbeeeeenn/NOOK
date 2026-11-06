@@ -1,5 +1,8 @@
-import { LOGS_PAGE_SIZE } from "@/data-access-layer/borrowLogs";
-import Link from "next/link";
+"use client";
+import { TABLE_PAGE_SIZE } from "@/constants";
+import clsx from "clsx";
+import { usePathname, useRouter } from "next/navigation";
+import { useTransition } from "react";
 
 export default function Pagination({
    page,
@@ -10,37 +13,43 @@ export default function Pagination({
    total: number;
    filters: { idNumber?: string; from?: string; to?: string };
 }) {
-   const totalPages = Math.ceil(total / LOGS_PAGE_SIZE);
+   const router = useRouter();
+   const pathname = usePathname();
+   const [isNavigating, startTransition] = useTransition();
+   const totalPages = Math.ceil(total / TABLE_PAGE_SIZE);
    if (totalPages <= 1) return null;
 
-   function href(nextPage: number) {
+   const onChangePage = (page: number) => {
       const params = new URLSearchParams();
       if (filters.idNumber) params.set("idNumber", filters.idNumber);
       if (filters.from) params.set("from", filters.from);
       if (filters.to) params.set("to", filters.to);
-      params.set("page", String(nextPage));
-      return `?${params.toString()}`;
-   }
-
+      params.set("page", String(page));
+      startTransition(() => router.push(pathname + `?${params.toString()}`));
+   };
    return (
       <nav
-         className="mt-3 flex items-center justify-between gap-3"
+         className={clsx(
+            "mt-3 flex items-center justify-between gap-3",
+            isNavigating && "opacity-50",
+         )}
+         inert={isNavigating}
          aria-label="Log pages"
       >
-         <Link
-            href={href(page - 1)}
+         <button
+            onClick={() => onChangePage(page - 1)}
             aria-disabled={page === 1}
             className={`rounded-md border px-3 py-1 text-sm ${
                page === 1 ? "pointer-events-none opacity-50" : "hover:bg-muted"
             }`}
          >
             Previous
-         </Link>
+         </button>
          <span className="text-muted-foreground text-sm">
             Page {page} of {totalPages}
          </span>
-         <Link
-            href={href(page + 1)}
+         <button
+            onClick={() => onChangePage(page + 1)}
             aria-disabled={page === totalPages}
             className={`rounded-md border px-3 py-1 text-sm ${
                page === totalPages
@@ -49,7 +58,7 @@ export default function Pagination({
             }`}
          >
             Next
-         </Link>
+         </button>
       </nav>
    );
 }

@@ -33,13 +33,12 @@ async function ComponentGenerator(
    }
 
    return [
-      logsWithBorrower.ok && (
-         <Pagination
-            page={page}
-            total={logsWithBorrower.data.total}
-            filters={{ idNumber }}
-         />
-      ),
+      <Pagination
+         key={0}
+         page={page}
+         total={logsWithBorrower.data.total}
+         filters={{ idNumber }}
+      />,
       logsWithBorrower.data.logs.length === 0 ? (
          <tr>
             <td colSpan={10} className="py-4">
