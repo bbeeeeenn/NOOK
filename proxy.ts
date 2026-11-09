@@ -8,10 +8,12 @@ import {
    borrowerRecordsPage,
    importBorrowerRecordsPage,
    reportsPage,
+   allLogsPage,
 } from "./constants";
 
 const protectedRoutes = [
    logsPage,
+   allLogsPage,
    borrowerRecordsPage,
    scannerPage,
    settingsPage,

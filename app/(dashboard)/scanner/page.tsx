@@ -5,7 +5,11 @@ import {
    BorrowerRecordGetPayload,
 } from "@/generated/prisma/models";
 import { Result } from "@/types/types";
-import { Scanner } from "@yudiel/react-qr-scanner";
+import {
+   IDetectedBarcode,
+   Scanner,
+   useDevices,
+} from "@yudiel/react-qr-scanner";
 import clsx from "clsx";
 import {
    AlertCircle,
@@ -13,6 +17,7 @@ import {
    Check,
    CheckSquare,
    LoaderCircle,
+   RefreshCcw,
    Square,
    User,
 } from "lucide-react";
@@ -20,6 +25,8 @@ import { SubmitEvent, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
 export default function ScannerPage() {
+   const devices = useDevices();
+
    const [inputs, setInputs] = useState<{
       bookBarcode: string;
       idNumber: string;
@@ -33,6 +40,14 @@ export default function ScannerPage() {
       idNumber?: string;
       isVisitor: boolean;
    } | null>(null);
+
+   const onScan = ([code]: IDetectedBarcode[]) => {
+      if (code.format === "qr_code") {
+         setInputs((prev) => ({ ...prev, idNumber: code.rawValue }));
+      } else {
+         setInputs((prev) => ({ ...prev, bookBarcode: code.rawValue }));
+      }
+   };
 
    const confirmationCardRef = useRef<HTMLDivElement>(null);
 
@@ -69,7 +84,20 @@ export default function ScannerPage() {
       if (!isLogging) setConfirmation(null);
    };
 
-   return (
+   return devices.length <= 0 ? (
+      <div className="border-green-primary bg-green-primary/70 absolute inset-x-4 inset-y-0 mx-auto my-auto flex h-fit flex-col items-center justify-center rounded-md border-2 py-10">
+         <p className="text-2xl font-bold text-white">No Camera Detected</p>
+         <button
+            className="text-yellow-primary mt-4 flex items-center justify-center gap-x-1 hover:underline"
+            onClick={() => window.location.reload()}
+         >
+            <span>
+               <RefreshCcw size={16} />
+            </span>
+            Refresh
+         </button>
+      </div>
+   ) : (
       <>
          <div className="mb-8 flex flex-wrap-reverse items-end justify-evenly gap-x-6 gap-y-8 pt-2">
             <form onSubmit={onSubmit} className="max-w-120 grow text-white">
@@ -132,7 +160,7 @@ export default function ScannerPage() {
             </form>
             <div className="max-h-90 max-w-85 min-w-50">
                <Scanner
-                  onScan={([]) => {}}
+                  onScan={onScan}
                   allowMultiple
                   scanDelay={1000}
                   classNames={{
