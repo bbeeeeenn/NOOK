@@ -14,7 +14,7 @@ function BorrowerRow({
          data={[
             borrowerRecord.idNumber,
             `${borrowerRecord.firstname}${borrowerRecord.middlename ? " " + borrowerRecord.middlename : ""} ${borrowerRecord.lastname}`,
-            borrowerRecord.yearLevel,
+            `Year ${borrowerRecord.yearLevel}`,
             borrowerRecord.college,
             borrowerRecord.program,
          ]}

@@ -1,7 +1,7 @@
 import FallbackRow from "@/components/table/fallbackRow";
 import Table from "@/components/table/table";
 import TableRow from "@/components/table/tableRow";
-import { adminLoginPage } from "@/constants";
+import { adminLoginPage, logsPage } from "@/constants";
 import getLogs from "@/data-access-layer/borrowLogs";
 import toPHDateString from "@/lib/toPHDateString";
 import { endOfDay, startOfDay } from "date-fns";
@@ -9,6 +9,8 @@ import { redirect } from "next/navigation";
 import React, { Suspense } from "react";
 import { File } from "lucide-react";
 import Pagination from "./_components/Pagination";
+import DeleteLogButton from "./_components/DeleteLogButton";
+import { ToastContainer } from "react-toastify";
 
 type SearchParameters = Promise<{
    idNumber?: string;
@@ -69,6 +71,9 @@ async function ComponentGenerator(
                      ? (row.borrower?.yearLevel ?? "[?]")
                      : "VISITOR",
                   row.scannedId ? (row.borrower?.college ?? "[?]") : "VISITOR",
+                  <>
+                     <DeleteLogButton logId={row.id} />
+                  </>,
                ]}
             />
          ))
@@ -91,6 +96,7 @@ async function Suspended({ searchParams }: { searchParams: SearchParameters }) {
                   "Program",
                   "Year",
                   "College",
+                  "Action",
                ]}
                extraStyling="min-w-230"
             >
@@ -108,27 +114,35 @@ export default async function Logs({
    searchParams: SearchParameters;
 }) {
    return (
-      <Suspense
-         fallback={
-            <div className="overflow-x-auto">
-               <Table
-                  headers={[
-                     "Date",
-                     "Book Barcode",
-                     "ID-NUMBER",
-                     "Name",
-                     "Program",
-                     "Year",
-                     "College",
-                  ]}
-                  extraStyling="min-w-230"
-               >
-                  <FallbackRow />
-               </Table>
-            </div>
-         }
-      >
-         <Suspended searchParams={searchParams} />
-      </Suspense>
+      <>
+         <Suspense
+            fallback={
+               <div className="overflow-x-auto">
+                  <Table
+                     headers={[
+                        "Date",
+                        "Book Barcode",
+                        "ID-NUMBER",
+                        "Name",
+                        "Program",
+                        "Year",
+                        "College",
+                     ]}
+                     extraStyling="min-w-230"
+                  >
+                     <FallbackRow />
+                  </Table>
+               </div>
+            }
+         >
+            <Suspended searchParams={searchParams} />
+         </Suspense>
+         {/* Toast container for this page */}
+         <ToastContainer
+            containerId={logsPage}
+            position="bottom-right"
+            closeButton={false}
+         />
+      </>
    );
 }

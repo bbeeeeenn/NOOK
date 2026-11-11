@@ -55,7 +55,7 @@ export default function ScannerPage() {
       e.preventDefault();
       setConfirmation({ ...inputs, isVisitor: isVisitor });
       requestAnimationFrame(() => {
-         confirmationCardRef.current?.scrollIntoView({ behavior: "smooth" });
+         window.scrollBy({ top: 1000, behavior: "smooth" });
       });
    };
 
@@ -211,6 +211,10 @@ function useFetch<T>(apiUrl: string): [T | null, string] {
             }
             console.error(e);
             setError("Unexpected error. Please try again.");
+         } finally {
+            requestAnimationFrame(() => {
+               window.scrollBy({ top: 1000, behavior: "smooth" });
+            });
          }
       })();
 
@@ -306,7 +310,7 @@ function ConfirmationCard({
                         ["Year level", borrower.yearLevel.toString()],
                      ].map((e) => (
                         <div key={e[0]} className="flex justify-between gap-2">
-                           <p className="font-normal opacity-95">{e[0]}</p>
+                           <p className="font-normal">{e[0]}</p>
                            <p className="font-semibold">{e[1]}</p>
                         </div>
                      ))}
@@ -358,6 +362,7 @@ function ConfirmationCard({
             {book && (
                <button
                   onClick={handleConfirm}
+                  autoFocus
                   className="bg-yellow-primary flex w-full grow items-center justify-center gap-x-1 rounded-sm px-4 py-2 shadow-sm"
                >
                   {isPending ? (
