@@ -18,8 +18,10 @@ import {
    CheckSquare,
    LoaderCircle,
    RefreshCcw,
+   Search,
    Square,
    User,
+   X,
 } from "lucide-react";
 import { SubmitEvent, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
@@ -55,7 +57,10 @@ export default function ScannerPage() {
       e.preventDefault();
       setConfirmation({ ...inputs, isVisitor: isVisitor });
       requestAnimationFrame(() => {
-         window.scrollBy({ top: 1000, behavior: "smooth" });
+         window.scrollBy({
+            top: 400,
+            behavior: "smooth",
+         });
       });
    };
 
@@ -154,7 +159,10 @@ export default function ScannerPage() {
                   </span>
                   Visitor
                </button>
-               <button className="bg-yellow-primary block w-full rounded-md p-2 font-semibold text-black shadow-md">
+               <button className="bg-yellow-primary outline-yellow-primary flex w-full items-center justify-center gap-2 rounded-md p-2 font-semibold text-black shadow-md outline-offset-2 focus-visible:outline-1">
+                  <span>
+                     <Search size={20} />
+                  </span>
                   Review
                </button>
             </form>
@@ -213,7 +221,7 @@ function useFetch<T>(apiUrl: string): [T | null, string] {
             setError("Unexpected error. Please try again.");
          } finally {
             requestAnimationFrame(() => {
-               window.scrollBy({ top: 1000, behavior: "smooth" });
+               window.scrollBy({ top: 400, behavior: "smooth" });
             });
          }
       })();
@@ -353,17 +361,11 @@ function ConfirmationCard({
          </div>
 
          <div className="flex gap-x-2 font-semibold text-black sm:gap-x-4">
-            <button
-               className="bg-yellow-primary grow rounded-sm px-8 py-2 shadow-sm"
-               onClick={close}
-            >
-               Close
-            </button>
             {book && (
                <button
                   onClick={handleConfirm}
                   autoFocus
-                  className="bg-yellow-primary flex w-full grow items-center justify-center gap-x-1 rounded-sm px-4 py-2 shadow-sm"
+                  className="bg-yellow-primary outline-yellow-primary order-2 flex w-full grow items-center justify-center gap-x-1 rounded-sm px-4 py-2 shadow-sm outline-offset-2 focus:outline-1"
                >
                   {isPending ? (
                      <span>
@@ -379,6 +381,15 @@ function ConfirmationCard({
                   )}
                </button>
             )}
+            <button
+               className="bg-yellow-primary outline-yellow-primary order-1 flex grow items-center justify-center gap-2 rounded-sm px-8 py-2 shadow-sm outline-offset-2 focus-visible:outline-1"
+               onClick={close}
+            >
+               <span>
+                  <X size={20} />
+               </span>{" "}
+               Close
+            </button>
          </div>
       </div>
    );
