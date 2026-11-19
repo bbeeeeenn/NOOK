@@ -11,6 +11,7 @@ import { AuthProvider } from "./sessionProvider";
 import { ToastContainer } from "react-toastify";
 import { cn } from "@/lib/utils";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import React from "react";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -38,7 +39,11 @@ export const metadata: Metadata = {
    verification: { google: "uig61X3q-a-UlvaJ1wLScJlCySgkRo8aNRMY8acL3wM" },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+   children,
+}: {
+   children: React.ReactNode;
+}) {
    return (
       <html
          lang="en"
