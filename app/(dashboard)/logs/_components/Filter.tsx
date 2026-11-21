@@ -2,9 +2,10 @@
 
 import { format, parseISO } from "date-fns";
 import {
+   ChevronDown,
    ChevronDownIcon,
+   ChevronUp,
    FilterIcon,
-   ListFilter,
    LoaderCircle,
    X,
 } from "lucide-react";
@@ -27,7 +28,7 @@ import {
 } from "react";
 import clsx from "clsx";
 
-export function DatePicker({
+function DatePicker({
    label,
    date,
    setDate,
@@ -119,9 +120,16 @@ export default function Filter({
             }
          >
             <span>
-               <ListFilter size={20} />
+               <FilterIcon size={20} />
             </span>
             Filters
+            <span>
+               {showFilter ? (
+                  <ChevronUp size={20} />
+               ) : (
+                  <ChevronDown size={20} />
+               )}
+            </span>
          </Button>
          <form
             className={clsx(
@@ -136,8 +144,10 @@ export default function Filter({
                placeholder="ID-Number"
                className="w-50 min-w-50"
             />
-            <DatePicker label="from" date={from} setDate={setFrom} />-
-            <DatePicker label="to" date={to} setDate={setTo} />
+            <div className="flex">
+               <DatePicker label="From" date={from} setDate={setFrom} />-
+               <DatePicker label="To" date={to} setDate={setTo} />
+            </div>
             <div className="flex gap-2">
                <Button
                   type="submit"

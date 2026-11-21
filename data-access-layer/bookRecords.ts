@@ -17,8 +17,6 @@ export async function getBookRecords(
    callnumber?: string,
    title?: string,
    author?: string,
-   sublocation?: string,
-   circulationType?: string,
    page = 1,
    pageSize = PAGE_SIZE,
 ): Promise<Result<PaginatedBooks>> {
@@ -36,8 +34,6 @@ export async function getBookRecords(
          callnumber,
          title,
          author,
-         sublocation,
-         circulationType,
          page,
          pageSize,
       );
@@ -60,8 +56,6 @@ async function getCachedBookRecords(
    callnumber?: string,
    title?: string,
    author?: string,
-   sublocation?: string,
-   circulationType?: string,
    page = 1,
    pageSize = PAGE_SIZE,
 ): Promise<PaginatedBooks> {
@@ -80,12 +74,6 @@ async function getCachedBookRecords(
          : undefined,
       author: author
          ? { contains: author, mode: "insensitive" as const }
-         : undefined,
-      sublocation: sublocation
-         ? { contains: sublocation, mode: "insensitive" as const }
-         : undefined,
-      circulationType: circulationType
-         ? { contains: circulationType, mode: "insensitive" as const }
          : undefined,
    };
 

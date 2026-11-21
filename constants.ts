@@ -232,32 +232,32 @@ export const programs = [
 
 export const colleges = [
    {
-      shorthand: "CEGS",
-      desc: "College of Engineering and Geosciences",
-   },
-   {
-      shorthand: "CED",
-      desc: "College of Education",
-   },
-   {
-      shorthand: "CFES",
-      desc: "College of Forestry and Environmental Science",
-   },
-   {
-      shorthand: "CMNS",
-      desc: "College of Mathematics and Natural Sciences",
+      shorthand: "CAA",
+      desc: "College of Agriculture and Agri-Industries",
    },
    {
       shorthand: "CCIS",
       desc: "College of Computing and Information Sciences",
    },
    {
-      shorthand: "CAA",
-      desc: "College of Agriculture and Agri-Industries",
+      shorthand: "CED",
+      desc: "College of Education",
+   },
+   {
+      shorthand: "CEGS",
+      desc: "College of Engineering and Geosciences",
    },
    {
       shorthand: "CHASS",
       desc: "College of Humanities and Social Sciences",
+   },
+   {
+      shorthand: "CMNS",
+      desc: "College of Mathematics and Natural Sciences",
+   },
+   {
+      shorthand: "COFES",
+      desc: "College of Forestry and Environmental Science",
    },
    {
       shorthand: "FACULTY",

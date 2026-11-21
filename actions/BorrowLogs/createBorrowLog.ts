@@ -7,6 +7,20 @@ import { Result } from "@/types/types";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import { revalidatePath } from "next/cache";
 
+function getClassNumberFromCallNumber(input: string): number {
+   const match = input.match(/^\S+\s+(\d+)/);
+   if (!match) {
+      throw new Error(`No code found in "${input}"`);
+   }
+
+   const code = Number(match[1]);
+   if (Number.isNaN(code)) {
+      throw new Error(`Invalid code "${match[1]}"`);
+   }
+
+   return code;
+}
+
 export default async function createBorrowLog(
    bookBarcode: string,
    scannedId?: string,
@@ -45,9 +59,15 @@ export default async function createBorrowLog(
 
       await prisma.borrowLog.create({
          data: {
-            bookBarcode: normalizedBookBarcode,
+            bookBarcode: existingBookRecord.copyCode,
             scannedId: normalizedScannedId,
             idNumber: existingBorrower?.idNumber,
+            circulationType: existingBookRecord.callnumber.startsWith("Cir")
+               ? "CIRCULATION"
+               : "FILIPINIANA",
+            classNumber: getClassNumberFromCallNumber(
+               existingBookRecord.callnumber,
+            ),
          },
       });
 

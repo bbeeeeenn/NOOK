@@ -11,16 +11,19 @@ import { File } from "lucide-react";
 import Pagination from "./_components/Pagination";
 import DeleteLogButton from "./_components/DeleteLogButton";
 import { ToastContainer } from "react-toastify";
+import Filter from "./_components/Filter";
 
 type SearchParameters = Promise<{
    idNumber?: string;
    page?: string;
+   from?: string;
+   to?: string;
 }>;
 
 async function ComponentGenerator(
-   searchParams: SearchParameters,
+   searchParams: Awaited<SearchParameters>,
 ): Promise<[React.ReactNode, React.ReactNode]> {
-   const { idNumber, page: pageParam } = await searchParams;
+   const { idNumber, page: pageParam } = searchParams;
    const page = Math.max(1, Number.parseInt(pageParam ?? "1", 10) || 1);
    const now = toPHDateString();
    const logsWithBorrower = await getLogs(
@@ -82,10 +85,16 @@ async function ComponentGenerator(
 }
 
 async function Suspended({ searchParams }: { searchParams: SearchParameters }) {
-   const components = await ComponentGenerator(searchParams);
+   const awaitedSearchParams = await searchParams;
+   const components = await ComponentGenerator(awaitedSearchParams);
 
    return (
       <>
+         <Filter
+            from={awaitedSearchParams.from}
+            to={awaitedSearchParams.to}
+            idNumber={awaitedSearchParams.idNumber}
+         />
          <div className="overflow-x-auto">
             <Table
                headers={[

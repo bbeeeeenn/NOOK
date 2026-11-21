@@ -7,6 +7,11 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Location {
+  CIRCULATION
+  FILIPINIANA
+}
+
 model BorrowLog {
   id String @id @default(cuid())
 
@@ -14,6 +19,9 @@ model BorrowLog {
   scannedId   String?
   idNumber    String?
   bookBarcode String
+  
+  classNumber Int
+  circulationType Location
 
   borrower BorrowerRecord? @relation(fields: [idNumber], references: [idNumber])
   book     BookRecord      @relation(fields: [bookBarcode], references: [copyCode])
@@ -27,8 +35,6 @@ model BookRecord {
   callnumber      String
   title           String
   author          String
-  sublocation     String
-  circulationType String
 
   borrowLog BorrowLog[]
 }

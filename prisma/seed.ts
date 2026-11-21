@@ -1,0 +1,181 @@
+import { prisma } from "@/lib/prisma";
+
+async function main() {
+   await Promise.all([
+      prisma.borrowerRecord.createMany({
+         data: [
+            {
+               idNumber: "241-00001",
+               firstname: "Ben Jay",
+               middlename: "",
+               lastname: "Lozada",
+               college: "CCIS",
+               program: "BSCS",
+               yearLevel: 3,
+               gender: "MALE",
+            },
+            {
+               idNumber: "241-00002",
+               firstname: "Maria",
+               middlename: "Santos",
+               lastname: "Reyes",
+               college: "CCIS",
+               program: "BSIT",
+               yearLevel: 2,
+               gender: "FEMALE",
+            },
+            {
+               idNumber: "241-00003",
+               firstname: "Juan",
+               middlename: "Dela",
+               lastname: "Cruz",
+               college: "CCIS",
+               program: "BSIS",
+               yearLevel: 4,
+               gender: "MALE",
+            },
+            {
+               idNumber: "241-00004",
+               firstname: "Andrea",
+               middlename: "Gonzales",
+               lastname: "Torres",
+               college: "CED",
+               program: "BEED",
+               yearLevel: 1,
+               gender: "FEMALE",
+            },
+            {
+               idNumber: "241-00005",
+               firstname: "Mark",
+               middlename: "Antonio",
+               lastname: "Villanueva",
+               college: "CEGS",
+               program: "BSCE",
+               yearLevel: 3,
+               gender: "MALE",
+            },
+            {
+               idNumber: "241-00006",
+               firstname: "Sophia",
+               middlename: "Marie",
+               lastname: "Garcia",
+               college: "CHASS",
+               program: "BSSW",
+               yearLevel: 2,
+               gender: "FEMALE",
+            },
+            {
+               idNumber: "241-00007",
+               firstname: "Carlos",
+               middlename: "Miguel",
+               lastname: "Fernandez",
+               college: "CMNS",
+               program: "BSAM",
+               yearLevel: 4,
+               gender: "MALE",
+            },
+            {
+               idNumber: "241-00008",
+               firstname: "Angela",
+               middlename: "Rose",
+               lastname: "Mendoza",
+               college: "COFES",
+               program: "BSF",
+               yearLevel: 3,
+               gender: "FEMALE",
+            },
+            {
+               idNumber: "241-00009",
+               firstname: "Daniel",
+               middlename: "James",
+               lastname: "Perez",
+               college: "CAA",
+               program: "BSA",
+               yearLevel: 2,
+               gender: "MALE",
+            },
+            {
+               idNumber: "241-00010",
+               firstname: "Nicole",
+               middlename: "Anne",
+               lastname: "Santos",
+               college: "SCHOOL OF MEDICINE",
+               program: "MEDICINE",
+               yearLevel: 1,
+               gender: "FEMALE",
+            },
+         ],
+         skipDuplicates: true,
+      }),
+      prisma.bookRecord.createMany({
+         data: [
+            {
+               copyCode: "CSUL00001",
+               author: "Author",
+               callnumber: "Cir 000 A001 2011",
+               title: "Title",
+            },
+            {
+               copyCode: "CSUL00002",
+               author: "Robert C. Martin",
+               callnumber: "Cir 005 M360 2008",
+               title: "Clean Code",
+            },
+            {
+               copyCode: "CSUL00003",
+               author: "Thomas H. Cormen",
+               callnumber: "Cir 005 C780 2009",
+               title: "Introduction to Algorithms",
+            },
+            {
+               copyCode: "CSUL00004",
+               author: "Ian Sommerville",
+               callnumber: "Cir 005 S660 2011",
+               title: "Software Engineering",
+            },
+            {
+               copyCode: "CSUL00005",
+               author: "Andrew S. Tanenbaum",
+               callnumber: "Cir 004 T160 2015",
+               title: "Modern Operating Systems",
+            },
+            {
+               copyCode: "CSUL00006",
+               author: "Donald E. Knuth",
+               callnumber: "Cir 005 K720 1997",
+               title: "The Art of Computer Programming",
+            },
+            {
+               copyCode: "CSUL00007",
+               author: "Jose Rizal",
+               callnumber: "Fil 813 R620 2005",
+               title: "Noli Me Tangere",
+            },
+            {
+               copyCode: "CSUL00008",
+               author: "Gabriel Garcia Marquez",
+               callnumber: "Fil 863 G210 2003",
+               title: "One Hundred Years of Solitude",
+            },
+            {
+               copyCode: "CSUL00009",
+               author: "Stephen Hawking",
+               callnumber: "Cir 530 H390 2001",
+               title: "A Brief History of Time",
+            },
+            {
+               copyCode: "CSUL00010",
+               author: "Paul A. Tipler",
+               callnumber: "Cir 530 T580 2008",
+               title: "Physics for Scientists and Engineers",
+            },
+         ],
+         skipDuplicates: true,
+      }),
+   ]);
+}
+
+main().catch((e) => {
+   console.error(e);
+   process.exit(1);
+});

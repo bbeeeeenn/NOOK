@@ -19,14 +19,7 @@ type SearchParameters = Promise<{
    pageSize?: string;
 }>;
 
-const headers = [
-   "Code",
-   "Call Number",
-   "Title",
-   "Author",
-   "Sublocation",
-   "Circulation Type",
-];
+const headers = ["Code", "Call Number", "Title", "Author"];
 
 function LoadingRow() {
    return (
@@ -46,16 +39,8 @@ async function SuspendedRows({
 }: {
    searchParams: SearchParameters;
 }) {
-   const {
-      copyCode,
-      callnumber,
-      title,
-      author,
-      sublocation,
-      circulationType,
-      page,
-      pageSize,
-   } = await searchParams;
+   const { copyCode, callnumber, title, author, page, pageSize } =
+      await searchParams;
    const currentPage = Math.max(1, Number.parseInt(page ?? "1", 10) || 1);
    const currentPageSize = pageSize
       ? Math.max(1, Number.parseInt(pageSize, 10) || PAGE_SIZE)
@@ -65,8 +50,6 @@ async function SuspendedRows({
       callnumber,
       title,
       author,
-      sublocation,
-      circulationType,
       currentPage,
       currentPageSize,
    );
@@ -108,16 +91,8 @@ async function SuspendedPagination({
 }: {
    searchParams: SearchParameters;
 }) {
-   const {
-      copyCode,
-      callnumber,
-      title,
-      author,
-      sublocation,
-      circulationType,
-      page,
-      pageSize,
-   } = await searchParams;
+   const { copyCode, callnumber, title, author, page, pageSize } =
+      await searchParams;
    const currentPage = Math.max(1, Number.parseInt(page ?? "1", 10) || 1);
    const currentPageSize = pageSize
       ? Math.max(1, Number.parseInt(pageSize, 10) || PAGE_SIZE)
@@ -127,8 +102,6 @@ async function SuspendedPagination({
       callnumber,
       title,
       author,
-      sublocation,
-      circulationType,
       currentPage,
       currentPageSize,
    );
@@ -144,8 +117,6 @@ async function SuspendedPagination({
             callnumber,
             title,
             author,
-            sublocation,
-            circulationType,
          }}
       />
    );
