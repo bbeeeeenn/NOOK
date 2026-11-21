@@ -10,21 +10,17 @@ import { Suspense } from "react";
 import { File } from "lucide-react";
 import Filter from "../_components/Filter";
 import Pagination from "../_components/Pagination";
-
-type SearchParameters = Promise<{
-   idNumber?: string;
-   from?: string;
-   to?: string;
-   page?: string;
-}>;
+import { SearchParameters } from "../page";
+import { Location } from "@/generated/prisma/enums";
 
 async function Suspended({ searchParams }: { searchParams: SearchParameters }) {
-   const { from, to, idNumber, page: pageParam } = await searchParams;
+   const { from, to, idNumber, page: pageParam, type } = await searchParams;
    const page = Math.max(1, Number.parseInt(pageParam ?? "1", 10) || 1);
    const logsWithBorrower = await getLogs(
       idNumber,
       from ? startOfDay(parseISO(from)) : undefined,
       to ? endOfDay(parseISO(to)) : undefined,
+      type ? (type.toUpperCase() as Location) : undefined,
       page,
    );
    if (!logsWithBorrower.ok) {
@@ -71,12 +67,13 @@ async function SuspendedPagination({
 }: {
    searchParams: SearchParameters;
 }) {
-   const { from, to, idNumber, page: pageParam } = await searchParams;
+   const { from, to, idNumber, page: pageParam, type } = await searchParams;
    const page = Math.max(1, Number.parseInt(pageParam ?? "1", 10) || 1);
    const logsWithBorrower = await getLogs(
       idNumber,
       from ? startOfDay(parseISO(from)) : undefined,
       to ? endOfDay(parseISO(to)) : undefined,
+      type ? (type.toUpperCase() as Location) : undefined,
       page,
    );
    if (!logsWithBorrower.ok) return null;
@@ -95,13 +92,14 @@ async function SuspendedFilter({
 }: {
    searchParams: SearchParameters;
 }) {
-   const { from, to, idNumber } = await searchParams;
+   const { from, to, idNumber, type } = await searchParams;
    return (
       <Filter
          key={`${from ?? ""}:${to ?? ""}:${idNumber ?? ""}`}
          from={from}
          to={to}
          idNumber={idNumber}
+         type={type}
       />
    );
 }

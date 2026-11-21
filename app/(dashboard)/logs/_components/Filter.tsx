@@ -67,10 +67,12 @@ export default function Filter({
    from: initialFrom,
    to: initialTo,
    idNumber: initialIdNumber,
+   type,
 }: {
-   from?: string;
-   to?: string;
-   idNumber?: string;
+   from: string | undefined;
+   to: string | undefined;
+   idNumber: string | undefined;
+   type: string | undefined;
 }) {
    const [showFilter, setShowFilter] = useState(
       !!initialFrom || !!initialTo || !!initialIdNumber,
@@ -83,6 +85,7 @@ export default function Filter({
    const [to, setTo] = useState<Date | undefined>(
       initialTo ? parseISO(initialTo) : undefined,
    );
+   const [circType, setCircType] = useState(type);
    const [idNumber, setIdNumber] = useState(initialIdNumber ?? "");
    const [isPendingFiltering, startTransitionFiltering] = useTransition();
    const [isPendingClearing, startTransitionClearing] = useTransition();
@@ -96,6 +99,7 @@ export default function Filter({
       if (idNumber.trim()) params.set("idNumber", idNumber.trim());
       if (from) params.set("from", format(from, "yyyy-MM-dd"));
       if (to) params.set("to", format(to, "yyyy-MM-dd"));
+      if (circType) params.set("type", circType);
       const query = params.toString();
       startTransitionFiltering(() => {
          router.replace(query ? `${pathname}?${query}` : pathname);
@@ -133,20 +137,39 @@ export default function Filter({
          </Button>
          <form
             className={clsx(
-               "mt-2 flex flex-wrap gap-2",
+               "mt-2 flex flex-wrap items-end gap-2 **:[p]:ml-1 **:[p]:text-xs",
                !showFilter && "hidden",
             )}
             onSubmit={applyFilters}
          >
-            <Input
-               value={idNumber}
-               onChange={(event) => setIdNumber(event.target.value)}
-               placeholder="ID-Number"
-               className="w-50 min-w-50"
-            />
-            <div className="flex">
-               <DatePicker label="From" date={from} setDate={setFrom} />-
-               <DatePicker label="To" date={to} setDate={setTo} />
+            <label className="flex w-44 flex-col gap-1 text-xs">
+               Type
+               <select
+                  value={circType}
+                  onChange={(e) => setCircType(e.target.value)}
+                  className="border-input h-8 rounded-lg border bg-transparent px-2 text-sm select-none"
+               >
+                  <option value="">All</option>
+                  <option value="circulation">Circulation</option>
+                  <option value="filipiniana">Filipiniana</option>
+               </select>
+            </label>
+            <div>
+               <p>ID Number</p>
+               <Input
+                  value={idNumber}
+                  onChange={(event) => setIdNumber(event.target.value)}
+                  placeholder="-"
+                  className="block w-50 min-w-50"
+               />
+            </div>
+
+            <div>
+               <p>Date</p>
+               <div className="flex gap-2">
+                  <DatePicker label="From" date={from} setDate={setFrom} />
+                  <DatePicker label="To" date={to} setDate={setTo} />
+               </div>
             </div>
             <div className="flex gap-2">
                <Button

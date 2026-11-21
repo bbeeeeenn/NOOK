@@ -1,6 +1,9 @@
 import { PAGE_SIZE } from "@/constants";
-import { Prisma } from "@/generated/prisma/client";
-import { BorrowLogGetPayload } from "@/generated/prisma/models";
+import { Location, Prisma } from "@/generated/prisma/client";
+import {
+   BorrowLogGetPayload,
+   BorrowLogWhereInput,
+} from "@/generated/prisma/models";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 import { Result } from "@/types/types";
@@ -19,6 +22,7 @@ export default async function getLogs(
    idNumber?: string,
    from?: Date,
    to?: Date,
+   type?: Location,
    page = 1,
    pageSize = PAGE_SIZE,
 ): Promise<Result<PaginatedBorrowLogs>> {
@@ -34,6 +38,7 @@ export default async function getLogs(
          idNumber,
          from,
          to,
+         type,
       );
       return { ok: true, data: logsWithBorrower };
    } catch (e) {
@@ -55,11 +60,12 @@ async function getCachedLogs(
    idNumber?: string,
    from?: Date,
    to?: Date,
+   type?: Location,
 ): Promise<PaginatedBorrowLogs> {
    "use cache: remote";
    cacheLife("days");
 
-   const where = {
+   const where: BorrowLogWhereInput = {
       idNumber,
       ...(from || to
          ? {
@@ -67,6 +73,11 @@ async function getCachedLogs(
                  gte: from,
                  lte: to,
               },
+           }
+         : {}),
+      ...(type
+         ? {
+              circulationType: type,
            }
          : {}),
    };

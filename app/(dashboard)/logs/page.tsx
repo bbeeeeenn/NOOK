@@ -12,24 +12,27 @@ import Pagination from "./_components/Pagination";
 import DeleteLogButton from "./_components/DeleteLogButton";
 import { ToastContainer } from "react-toastify";
 import Filter from "./_components/Filter";
+import { Location } from "@/generated/prisma/enums";
 
-type SearchParameters = Promise<{
+export type SearchParameters = Promise<{
    idNumber?: string;
-   page?: string;
    from?: string;
    to?: string;
+   page?: string;
+   type?: "circulation" | "filipiniana";
 }>;
 
 async function ComponentGenerator(
    searchParams: Awaited<SearchParameters>,
 ): Promise<[React.ReactNode, React.ReactNode]> {
-   const { idNumber, page: pageParam } = searchParams;
+   const { idNumber, page: pageParam, type } = searchParams;
    const page = Math.max(1, Number.parseInt(pageParam ?? "1", 10) || 1);
    const now = toPHDateString();
    const logsWithBorrower = await getLogs(
       idNumber,
       startOfDay(now),
       endOfDay(now),
+      type ? (type.toUpperCase() as Location) : undefined,
       page,
    );
    if (!logsWithBorrower.ok) {
@@ -94,6 +97,7 @@ async function Suspended({ searchParams }: { searchParams: SearchParameters }) {
             from={awaitedSearchParams.from}
             to={awaitedSearchParams.to}
             idNumber={awaitedSearchParams.idNumber}
+            type={awaitedSearchParams.type}
          />
          <div className="overflow-x-auto">
             <Table
