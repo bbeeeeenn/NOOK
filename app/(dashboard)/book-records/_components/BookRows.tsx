@@ -16,8 +16,6 @@ function BookRow({
             bookRecord.callnumber,
             bookRecord.title,
             bookRecord.author,
-            bookRecord.sublocation,
-            bookRecord.circulationType,
          ]}
       />
    );

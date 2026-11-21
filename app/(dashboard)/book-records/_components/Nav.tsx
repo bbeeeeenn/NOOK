@@ -20,7 +20,7 @@ async function AllBooksCount() {
 
 export default function Nav() {
    return (
-      <PillTabContainer cols={2}>
+      <PillTabContainer>
          <Pill label="All" targetRoute={bookRecordsPage}>
             <Suspense>
                <AllBooksCount />
