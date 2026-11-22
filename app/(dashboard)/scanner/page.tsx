@@ -70,7 +70,7 @@ export default function ScannerPage() {
       const loadingToast = toast.loading("Processing...");
       const res = await createBorrowLog(
          confirmation.bookBarcode,
-         confirmation.idNumber,
+         !isVisitor ? confirmation.idNumber : undefined,
       );
       toast.update(loadingToast, {
          type: res.ok ? "success" : "error",

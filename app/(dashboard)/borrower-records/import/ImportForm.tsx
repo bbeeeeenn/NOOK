@@ -178,7 +178,7 @@ export default function ImportForm() {
                className="cursor-pointer rounded-md border border-black/15 p-2 text-sm file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-black/5 file:px-3 file:py-2"
             />
             <p className="text-xs text-black/60">
-               Required columns, in order: {headers.join(", ")}
+               Required columns (any order): {headers.join(", ")}
             </p>
             <div className="flex flex-wrap gap-3">
                <button

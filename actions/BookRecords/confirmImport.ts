@@ -114,25 +114,21 @@ export default async function confirmBookImport(
                const batch = importRows.slice(offset, offset + batchSize);
                await transaction.$executeRaw(Prisma.sql`
                   INSERT INTO "BookRecord"
-                     ("copyCode", "callnumber", "title", "author", "sublocation", "circulationType")
+                     ("copyCode", "callnumber", "title", "author")
                   VALUES ${Prisma.join(
                      batch.map(
                         (row) => Prisma.sql`(
                            ${row.copyCode},
                            ${row.callnumber},
                            ${row.title},
-                           ${row.author},
-                           ${row.sublocation},
-                           ${row.circulationType}
+                           ${row.author}
                         )`,
                      ),
                   )}
                   ON CONFLICT ("copyCode") DO UPDATE SET
                      "callnumber" = EXCLUDED."callnumber",
                      "title" = EXCLUDED."title",
-                     "author" = EXCLUDED."author",
-                     "sublocation" = EXCLUDED."sublocation",
-                     "circulationType" = EXCLUDED."circulationType"
+                     "author" = EXCLUDED."author"
                `);
             }
 

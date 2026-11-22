@@ -5,8 +5,6 @@ export const BOOK_IMPORT_HEADERS = [
    "callnumber",
    "title",
    "author",
-   "sublocation",
-   "circulationType",
 ] as const;
 
 export const BOOK_IMPORT_MAX_ROWS = 50_000;
@@ -17,8 +15,6 @@ export type BookImportRow = {
    callnumber: string;
    title: string;
    author: string;
-   sublocation: string;
-   circulationType: string;
 };
 
 export type BookImportError = {
@@ -83,15 +79,17 @@ export function validateBookWorkbook(
 
    const errors: BookImportError[] = [];
    const headerRow = matrix[0] ?? [];
+   const headerIndexes = new Map<string, number>();
+   headerRow.forEach((value, index) => {
+      headerIndexes.set(getCellValue(value), index);
+   });
    if (
-      headerRow.length !== BOOK_IMPORT_HEADERS.length ||
-      BOOK_IMPORT_HEADERS.some(
-         (header, index) => getCellValue(headerRow[index]) !== header,
-      )
+      headerRow.length < BOOK_IMPORT_HEADERS.length ||
+      BOOK_IMPORT_HEADERS.some((header) => !headerIndexes.has(header))
    ) {
       errors.push({
          row: 1,
-         message: `Headers must be exactly: ${BOOK_IMPORT_HEADERS.join(", ")}`,
+         message: `Headers must include exactly these names, in any order: ${BOOK_IMPORT_HEADERS.join(", ")}`,
       });
    }
 
@@ -116,23 +114,14 @@ export function validateBookWorkbook(
    for (const [index, rawRow] of dataRows.entries()) {
       const rowNumber = index + 2;
       const row = rawRow ?? [];
-      const [
-         copyCode,
-         callnumber,
-         title,
-         author,
-         sublocation,
-         circulationType,
-      ] = BOOK_IMPORT_HEADERS.map((_, columnIndex) =>
-         getCellValue(row[columnIndex]),
+      const [copyCode, callnumber, title, author] = BOOK_IMPORT_HEADERS.map(
+         (header) => getCellValue(row[headerIndexes.get(header) ?? -1]),
       );
       const values = {
          copyCode,
          callnumber,
          title,
          author,
-         sublocation,
-         circulationType,
       };
 
       for (const [field, value] of Object.entries(values)) {

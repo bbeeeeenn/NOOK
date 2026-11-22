@@ -150,8 +150,8 @@ export default function Filter({
                   className="border-input h-8 rounded-lg border bg-transparent px-2 text-sm select-none"
                >
                   <option value="">All</option>
-                  <option value="circulation">Circulation</option>
-                  <option value="filipiniana">Filipiniana</option>
+                  <option value="CIRCULATION">Circulation</option>
+                  <option value="FILIPINIANA">Filipiniana</option>
                </select>
             </label>
             <div>

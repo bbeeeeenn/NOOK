@@ -45,15 +45,6 @@ function getCellValue(value: unknown): string {
    return String(value).trim();
 }
 
-function isExpectedHeaderRow(row: unknown[]): boolean {
-   return (
-      row.length === BORROWER_IMPORT_HEADERS.length &&
-      BORROWER_IMPORT_HEADERS.every(
-         (header, index) => getCellValue(row[index]) === header,
-      )
-   );
-}
-
 function parseYearLevel(value: string): number | null {
    if (!/^[1-6]$/.test(value)) return null;
    return Number(value);
@@ -117,11 +108,18 @@ export function validateBorrowerWorkbook(
 
    const errors: BorrowerImportError[] = [];
    const headerRow = matrix[0] ?? [];
+   const headerIndexes = new Map<string, number>();
+   headerRow.forEach((value, index) => {
+      headerIndexes.set(getCellValue(value), index);
+   });
 
-   if (!isExpectedHeaderRow(headerRow)) {
+   if (
+      headerRow.length < BORROWER_IMPORT_HEADERS.length ||
+      BORROWER_IMPORT_HEADERS.some((header) => !headerIndexes.has(header))
+   ) {
       errors.push({
          row: 1,
-         message: `Headers must be exactly: ${BORROWER_IMPORT_HEADERS.join(", ")}`,
+         message: `Headers must include exactly these names, in any order: ${BORROWER_IMPORT_HEADERS.join(", ")}`,
       });
    }
 
@@ -150,8 +148,8 @@ export function validateBorrowerWorkbook(
          college,
          program,
          yearLevelValue,
-      ] = BORROWER_IMPORT_HEADERS.map((_, columnIndex) =>
-         getCellValue(row[columnIndex]),
+      ] = BORROWER_IMPORT_HEADERS.map((header) =>
+         getCellValue(row[headerIndexes.get(header) ?? -1]),
       );
 
       const values = {

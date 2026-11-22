@@ -19,23 +19,14 @@ function downloadTemplate() {
          "Cir 600 M001 2011",
          "JavaScript: The Good Parts",
          "Douglas Crockford",
-         "CSU-Circulation",
-         "CSU-Circulation",
       ],
    ]);
-   worksheet["!cols"] = [
-      { wch: 16 },
-      { wch: 20 },
-      { wch: 38 },
-      { wch: 24 },
-      { wch: 24 },
-      { wch: 20 },
-   ];
+   worksheet["!cols"] = [{ wch: 16 }, { wch: 20 }, { wch: 38 }, { wch: 24 }];
 
    const instructions = XLSX.utils.aoa_to_sheet([
       ["Book records import template"],
       [""],
-      ["Required columns, in order", headers.join(", ")],
+      ["Required columns (any order)", headers.join(", ")],
       [
          "copyCode",
          "Must be unique within the workbook; existing codes are updated.",
@@ -173,7 +164,7 @@ export default function ImportForm() {
                className="cursor-pointer rounded-md border border-black/15 p-2 text-sm file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-black/5 file:px-3 file:py-2"
             />
             <p className="text-xs text-black/60">
-               Required columns, in order: {headers.join(", ")}
+               Required columns (any order): {headers.join(", ")}
             </p>
             <div className="flex flex-wrap gap-3">
                <button

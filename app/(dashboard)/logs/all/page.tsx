@@ -20,7 +20,7 @@ async function Suspended({ searchParams }: { searchParams: SearchParameters }) {
       idNumber,
       from ? startOfDay(parseISO(from)) : undefined,
       to ? endOfDay(parseISO(to)) : undefined,
-      type ? (type.toUpperCase() as Location) : undefined,
+      [Location.CIRCULATION, Location.FILIPINIANA].find((l) => l === type),
       page,
    );
    if (!logsWithBorrower.ok) {
@@ -73,7 +73,7 @@ async function SuspendedPagination({
       idNumber,
       from ? startOfDay(parseISO(from)) : undefined,
       to ? endOfDay(parseISO(to)) : undefined,
-      type ? (type.toUpperCase() as Location) : undefined,
+      [Location.CIRCULATION, Location.FILIPINIANA].find((l) => l === type),
       page,
    );
    if (!logsWithBorrower.ok) return null;

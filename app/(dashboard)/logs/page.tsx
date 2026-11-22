@@ -19,7 +19,7 @@ export type SearchParameters = Promise<{
    from?: string;
    to?: string;
    page?: string;
-   type?: "circulation" | "filipiniana";
+   type?: string;
 }>;
 
 async function ComponentGenerator(
@@ -32,7 +32,7 @@ async function ComponentGenerator(
       idNumber,
       startOfDay(now),
       endOfDay(now),
-      type ? (type.toUpperCase() as Location) : undefined,
+      [Location.CIRCULATION, Location.FILIPINIANA].find((l) => l === type),
       page,
    );
    if (!logsWithBorrower.ok) {

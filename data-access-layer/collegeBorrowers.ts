@@ -45,11 +45,6 @@ export default async function getCollegeBorrowerCounts(
             college,
             borrowers,
          })),
-         // .sort(
-         //    (a, b) =>
-         //       b.borrowers - a.borrowers ||
-         //       a.college.localeCompare(b.college),
-         // ),
       };
    } catch (error) {
       console.error("Error on getCollegeBorrowerCounts()", error);
