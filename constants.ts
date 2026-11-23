@@ -9,8 +9,9 @@ export const bookRecordsPage = "/book-records";
 export const importBorrowerRecordsPage = "/borrower-records/import";
 export const importBookRecordsPage = "/book-records/import";
 export const scannerPage = "/scanner";
-export const reportsPage = "/reports";
 export const settingsPage = "/settings";
+export const reportsPage = "/reports";
+export const perCollegeAndUsers = "/reports/per-college-and-users";
 
 export const PAGE_SIZE = 20;
 

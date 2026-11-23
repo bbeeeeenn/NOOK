@@ -1,4 +1,4 @@
-import { Prisma } from "@/generated/prisma/client";
+import { Location, Prisma } from "@/generated/prisma/client";
 import { colleges } from "@/constants";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
@@ -12,6 +12,7 @@ export type CollegeBorrowerCount = {
 export default async function getCollegeBorrowerCounts(
    from: Date,
    to: Date,
+   type?: Location,
 ): Promise<Result<CollegeBorrowerCount[]>> {
    const session = await auth();
    if (!session?.user) {
@@ -20,7 +21,7 @@ export default async function getCollegeBorrowerCounts(
 
    try {
       const borrowedBy = await prisma.borrowLog.findMany({
-         where: { date: { gte: from, lte: to } },
+         where: { date: { gte: from, lte: to }, circulationType: type },
          select: {
             idNumber: true,
             borrower: { select: { college: true } },
