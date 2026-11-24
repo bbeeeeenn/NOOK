@@ -58,12 +58,12 @@
    --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
    :root {
-      /* --background: #0a0a0a;
-    --foreground: #ededed; */
+      --background: #0a0a0a;
+      --foreground: #ededed;
    }
-}
+} */
 
 *::selection {
    background-color: #f9dc07;

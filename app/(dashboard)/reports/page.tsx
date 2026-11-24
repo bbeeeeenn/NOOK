@@ -2,30 +2,42 @@ import {
    byClassNumbersReportPage,
    perCollegeAndUsersReportPage,
 } from "@/constants";
-import { ChevronRight } from "lucide-react";
+import {
+   Book,
+   ChartNoAxesColumn,
+   ChevronRight,
+   LucideIcon,
+   UsersRound,
+} from "lucide-react";
 import Link from "next/link";
+
+function LinkCard(props: {
+   href: string;
+   icon: LucideIcon;
+   children: React.ReactNode;
+}) {
+   return (
+      <Link
+         href={props.href}
+         className="@container flex aspect-square flex-col justify-between gap-4 rounded-sm bg-gray-100 p-4 font-medium text-black/75 shadow-sm outline"
+      >
+         <span>
+            <ChartNoAxesColumn size={50} />
+         </span>
+         <p className="text-xl @xs:text-2xl">{props.children}</p>
+      </Link>
+   );
+}
 
 export default async function ReportsPage() {
    return (
-      <>
-         <Link
-            href={perCollegeAndUsersReportPage}
-            className="flex w-fit items-center gap-2 rounded-sm bg-gray-100 px-4 py-3 text-lg font-medium shadow-sm outline"
-         >
+      <div className="grid grid-cols-1 gap-4 @md:grid-cols-2 @3xl:grid-cols-3">
+         <LinkCard href={perCollegeAndUsersReportPage} icon={UsersRound}>
             In-house utilization per college and other library users
-            <span>
-               <ChevronRight />
-            </span>
-         </Link>
-         <Link
-            href={byClassNumbersReportPage}
-            className="mt-4 flex w-fit items-center gap-2 rounded-sm bg-gray-100 px-4 py-3 text-lg font-medium shadow-sm outline"
-         >
-            In-house utilization per DDC
-            <span>
-               <ChevronRight />
-            </span>
-         </Link>
-      </>
+         </LinkCard>
+         <LinkCard href={byClassNumbersReportPage} icon={Book}>
+            In-house utilization per Dewey Decimal Classification
+         </LinkCard>
+      </div>
    );
 }
