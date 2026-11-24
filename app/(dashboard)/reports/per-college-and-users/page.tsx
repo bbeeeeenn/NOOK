@@ -66,7 +66,7 @@ function ReportSkeleton() {
 async function Suspended({ searchParams }: { searchParams: SearchParameters }) {
    const { month, type } = await searchParams;
    const selectedMonth = getSelectedMonth(month);
-   const counts = await getCollegeBorrowerCounts(
+   const byCollegeBorrowCounts = await getCollegeBorrowerCounts(
       startOfMonth(selectedMonth),
       endOfMonth(selectedMonth),
       ([Location.CIRCULATION, Location.FILIPINIANA] as Location[]).find(
@@ -74,14 +74,14 @@ async function Suspended({ searchParams }: { searchParams: SearchParameters }) {
       ),
    );
 
-   if (!counts.ok) {
-      if (counts.error === "AUTH") redirect(adminLoginPage);
+   if (!byCollegeBorrowCounts.ok) {
+      if (byCollegeBorrowCounts.error === "AUTH") redirect(adminLoginPage);
       return <p className="p-4">Unable to load the report.</p>;
    }
 
    return (
       <>
-         <form method="get" className="mb-4 flex items-end gap-2">
+         <form method="get" className="mb-4 flex flex-wrap items-end gap-2">
             <label className="flex flex-col gap-1 text-sm font-medium">
                Type
                <select
@@ -117,10 +117,10 @@ async function Suspended({ searchParams }: { searchParams: SearchParameters }) {
          </form>
 
          <Table headers={["COLLEGE", "NO. OF TITLES USED"]}>
-            {counts.data.length === 0 ? (
+            {byCollegeBorrowCounts.data.length === 0 ? (
                <FallbackRow />
             ) : (
-               counts.data.map((row, index) => (
+               byCollegeBorrowCounts.data.map((row, index) => (
                   <TableRow
                      key={row.college}
                      index={index}
@@ -128,12 +128,12 @@ async function Suspended({ searchParams }: { searchParams: SearchParameters }) {
                   />
                ))
             )}
-            {counts.data.length > 0 && (
+            {byCollegeBorrowCounts.data.length > 0 && (
                <TableRow
-                  index={counts.data.length}
+                  index={byCollegeBorrowCounts.data.length}
                   data={[
                      "TOTAL",
-                     counts.data.reduce(
+                     byCollegeBorrowCounts.data.reduce(
                         (total, row) => total + row.borrowers,
                         0,
                      ),
@@ -152,7 +152,7 @@ export default async function ReportsPage({
    searchParams: SearchParameters;
 }) {
    return (
-      <div className="p-4">
+      <>
          <Link
             href={reportsPage}
             className="flex w-fit items-center gap-2 rounded-sm bg-gray-100 px-3 py-2 font-medium shadow-sm outline"
@@ -168,6 +168,6 @@ export default async function ReportsPage({
          <Suspense fallback={<ReportSkeleton />}>
             <Suspended searchParams={searchParams} />
          </Suspense>
-      </div>
+      </>
    );
 }
