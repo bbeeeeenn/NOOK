@@ -30,8 +30,8 @@ export const authOptions = {
       },
       async jwt({ account, user, token, profile }) {
          if (user) {
-            token.role =
-               process.env.ADMIN_EMAIL === user.email ? "Admin" : "Staff";
+            token.role = "Admin";
+            // process.env.ADMIN_EMAIL === user.email ? "Admin" : "Staff";
          }
 
          if (account?.provider === "google" && profile?.picture && token.sub) {
