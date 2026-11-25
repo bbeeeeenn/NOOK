@@ -21,7 +21,7 @@ export const authOptions = {
             const allowedEmails = process.env
                .ALLOWED_EMAILS!.toLowerCase()
                .split(";");
-            allowedEmails.push(process.env.ADMIN_EMAIL!.toLowerCase());
+            allowedEmails.push(process.env.ADMIN_EMAIL?.toLowerCase() ?? "");
             return (
                allowedEmails.includes(user.email) || allowedEmails.includes("*")
             );
@@ -30,8 +30,11 @@ export const authOptions = {
       },
       async jwt({ account, user, token, profile }) {
          if (user) {
-            token.role = "Admin";
-            // process.env.ADMIN_EMAIL === user.email ? "Admin" : "Staff";
+            token.role =
+               process.env.ADMIN_EMAIL === "*" ||
+               process.env.ADMIN_EMAIL === user.email
+                  ? "Admin"
+                  : "Staff";
          }
 
          if (account?.provider === "google" && profile?.picture && token.sub) {

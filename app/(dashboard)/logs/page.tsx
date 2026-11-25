@@ -70,13 +70,17 @@ async function ComponentGenerator(
                   row.scannedId
                      ? row.borrower
                         ? `${row.borrower.firstname} ${row.borrower.middlename ? row.borrower.middlename + " " : ""}${row.borrower.lastname}`
-                        : "[?]"
+                        : "[NO DATA]"
                      : "VISITOR",
-                  row.scannedId ? (row.borrower?.program ?? "[?]") : "VISITOR",
                   row.scannedId
-                     ? (row.borrower?.yearLevel ?? "[?]")
+                     ? (row.borrower?.program ?? "[NO DATA]")
                      : "VISITOR",
-                  row.scannedId ? (row.borrower?.college ?? "[?]") : "VISITOR",
+                  row.scannedId
+                     ? (row.borrower?.yearLevel ?? "[NO DATA]")
+                     : "VISITOR",
+                  row.scannedId
+                     ? (row.borrower?.college ?? "[NO DATA]")
+                     : "VISITOR",
                   <>
                      <DeleteLogButton logId={row.id} />
                   </>,

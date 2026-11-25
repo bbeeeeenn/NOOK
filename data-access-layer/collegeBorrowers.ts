@@ -23,6 +23,7 @@ export default async function getCollegeBorrowerCounts(
       const borrowedBy = await prisma.borrowLog.findMany({
          where: { date: { gte: from, lte: to }, circulationType: type },
          select: {
+            scannedId: true,
             idNumber: true,
             borrower: { select: { college: true } },
          },
@@ -34,10 +35,14 @@ export default async function getCollegeBorrowerCounts(
       }
 
       for (const row of borrowedBy) {
-         counts.set(
-            row.borrower?.college ?? "VISITOR",
-            (counts.get(row.borrower?.college ?? "VISITOR") ?? 0) + 1,
-         );
+         if (row.borrower) {
+            counts.set(
+               row.borrower.college,
+               (counts.get(row.borrower.college) ?? 0) + 1,
+            );
+         } else if (row.scannedId === null) {
+            counts.set("VISITOR", (counts.get("VISITOR") ?? 0) + 1);
+         }
       }
 
       return {
