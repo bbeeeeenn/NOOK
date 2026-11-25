@@ -1,12 +1,17 @@
 import { PickEnumerable } from "@/generated/prisma/internal/prismaNamespace";
-import { BorrowLogGroupByOutputType } from "@/generated/prisma/models";
+import {
+   BorrowLogGroupByOutputType,
+   BorrowLogWhereInput,
+} from "@/generated/prisma/models";
+import { Location } from "@/generated/prisma/enums";
+import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 import { Result } from "@/types/types";
 import { cacheLife } from "next/cache";
 
 export type TopBorrowers = (PickEnumerable<
    BorrowLogGroupByOutputType,
-   "idNumber"[]
+   "scannedId"[]
 > & {
    _count: {
       bookBarcode: number;
@@ -18,39 +23,30 @@ export default async function getTopBorrowers(
    to?: Date,
    page = 1,
    pageSize = 20,
-): Promise<
-   Result<
-      (PickEnumerable<BorrowLogGroupByOutputType, "idNumber"[]> & {
-         _count: {
-            bookBarcode: number;
-         };
-      })[]
-   >
-> {
+   type?: Location,
+): Promise<Result<TopBorrowers>> {
+   const session = await auth();
+   if (!session?.user)
+      return { ok: false, error: "AUTH", message: "Unauthorized" };
+
    try {
-      const top = await getCachedTopBorrowers(from, to, page, pageSize);
+      const where: BorrowLogWhereInput = {
+         scannedId: { not: null },
+         ...(from || to ? { date: { gte: from, lte: to } } : {}),
+         ...(type ? { circulationType: type } : {}),
+      };
+      const top = await prisma.borrowLog.groupBy({
+         by: ["scannedId"],
+         where,
+         _count: { bookBarcode: true },
+         orderBy: { _count: { bookBarcode: "desc" } },
+         skip: (page - 1) * pageSize,
+         take: pageSize,
+      });
+
       return { ok: true, data: top };
-   } catch (e) {
-      console.error(e);
+   } catch (error) {
+      console.error("Error on getTopBorrowers()", error);
       return { ok: false, error: "OTHER", message: "Unexpected error" };
    }
-}
-
-async function getCachedTopBorrowers(
-   from?: Date,
-   to?: Date,
-   page = 1,
-   pageSize = 20,
-) {
-   "use cache: remote";
-   cacheLife("days");
-   const where = { ...(from || to ? { date: { gte: from, lte: to } } : {}) };
-   return await prisma.borrowLog.groupBy({
-      by: ["idNumber"],
-      where,
-      _count: { bookBarcode: true },
-      orderBy: { _count: { bookBarcode: "desc" } },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-   });
 }

@@ -13,6 +13,7 @@ export const settingsPage = "/settings";
 export const reportsPage = "/reports";
 export const perCollegeAndUsersReportPage = "/reports/per-college-and-users";
 export const byClassNumbersReportPage = "/reports/by-class-numbers";
+export const topBorrowersReportPage = "/reports/top-borrowers";
 
 export const PAGE_SIZE = 20;
 

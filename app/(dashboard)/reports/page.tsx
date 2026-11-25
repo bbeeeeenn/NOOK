@@ -1,14 +1,9 @@
 import {
    byClassNumbersReportPage,
    perCollegeAndUsersReportPage,
+   topBorrowersReportPage,
 } from "@/constants";
-import {
-   Book,
-   ChartNoAxesColumn,
-   ChevronRight,
-   LucideIcon,
-   UsersRound,
-} from "lucide-react";
+import { Book, ChartNoAxesColumn, LucideIcon, UsersRound } from "lucide-react";
 import Link from "next/link";
 
 function LinkCard(props: {
@@ -37,6 +32,9 @@ export default async function ReportsPage() {
          </LinkCard>
          <LinkCard href={byClassNumbersReportPage} icon={Book}>
             In-house utilization per Dewey Decimal Classification
+         </LinkCard>
+         <LinkCard href={topBorrowersReportPage} icon={UsersRound}>
+            Top borrowers
          </LinkCard>
       </div>
    );
