@@ -12,8 +12,8 @@ const filterFields = [
    ["callnumber", "Call Number"],
    ["title", "Title"],
    ["author", "Author"],
-   ["sublocation", "Sublocation"],
-   ["circulationType", "Circulation Type"],
+   // ["sublocation", "Sublocation"],
+   // ["circulationType", "Circulation Type"],
 ] as const;
 
 type BookFilters = Partial<Record<(typeof filterFields)[number][0], string>>;

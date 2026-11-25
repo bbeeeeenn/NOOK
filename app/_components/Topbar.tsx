@@ -50,7 +50,7 @@ export default function Topbar() {
          <div
             className={clsx(
                "bg-white-primary fixed inset-x-0 top-14 overflow-y-hidden text-lg font-medium shadow-md transition-[height] duration-300 sm:hidden",
-               isOpen ? "h-39" : "h-0",
+               isOpen ? "h-26" : "h-0",
             )}
             onClick={() => setIsOpen(false)}
          >

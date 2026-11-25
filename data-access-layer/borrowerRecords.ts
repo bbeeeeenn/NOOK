@@ -3,7 +3,10 @@ import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 import { cacheLife } from "next/cache";
 import type { Result } from "@/types/types";
-import { BorrowerRecordModel } from "@/generated/prisma/models";
+import {
+   BorrowerRecordModel,
+   BorrowerRecordWhereInput,
+} from "@/generated/prisma/models";
 import { redirect } from "next/navigation";
 import { logsPage, PAGE_SIZE } from "@/constants";
 
@@ -62,9 +65,19 @@ async function getCachedBorrowerRecords(
    "use cache: remote";
    cacheLife("days");
 
-   const where = {
+   const nameTerms = name?.trim().split(/\s+/).filter(Boolean) ?? [];
+
+   const where: BorrowerRecordWhereInput = {
       idNumber,
-      name: name ? { contains: name, mode: "insensitive" as const } : undefined,
+      ...(nameTerms.length > 0 && {
+         AND: nameTerms.map((term) => ({
+            OR: [
+               { firstname: { contains: term, mode: "insensitive" as const } },
+               { middlename: { contains: term, mode: "insensitive" as const } },
+               { lastname: { contains: term, mode: "insensitive" as const } },
+            ],
+         })),
+      }),
       program,
       college,
    };
