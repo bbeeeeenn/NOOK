@@ -7,7 +7,6 @@ import { Location } from "@/generated/prisma/enums";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 import { Result } from "@/types/types";
-import { cacheLife } from "next/cache";
 
 export type TopBorrowers = (PickEnumerable<
    BorrowLogGroupByOutputType,
