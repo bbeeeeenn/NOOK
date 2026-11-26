@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function SettingsPage() {
    return (
-      <div className="min-h-[calc(100dvh-85px)] min-w-75 bg-[#34A853] p-7 select-none">
+      <div className="min-h-[calc(100dvh-85px)] min-w-75 bg-[#34A853] p-7 shadow-[0_400px_0_#34A853] select-none">
          <div className="mx-auto max-w-150 pb-4">
             <p className="mb-4 flex items-center gap-2 text-2xl font-semibold text-white">
                <span>
