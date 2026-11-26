@@ -13,8 +13,6 @@ type SearchParameters = Promise<{
    callnumber?: string;
    title?: string;
    author?: string;
-   sublocation?: string;
-   circulationType?: string;
    page?: string;
    pageSize?: string;
 }>;
@@ -127,15 +125,7 @@ async function SuspendedFilter({
 }: {
    searchParams: SearchParameters;
 }) {
-   const {
-      copyCode,
-      callnumber,
-      title,
-      author,
-      sublocation,
-      circulationType,
-      pageSize,
-   } = await searchParams;
+   const { copyCode, callnumber, title, author, pageSize } = await searchParams;
 
    return (
       <Filter
@@ -145,8 +135,6 @@ async function SuspendedFilter({
             callnumber,
             title,
             author,
-            sublocation,
-            circulationType,
          }}
          pageSize={pageSize}
       />
